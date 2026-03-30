@@ -1,4 +1,8 @@
-# 🎯 Contest Hub
+<h1 align="center">🎯 Contest Hub</h1>
+
+<p align="center">
+  🚀 <b>Web-Based Contest Registration & Management System</b>
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Backend-Django-green?style=for-the-badge&logo=django"/>
@@ -8,12 +12,8 @@
 </p>
 
 <p align="center">
-  <b>🚀 Built for academic excellence, real-world scalability, and placement-ready portfolio</b>
+  💡 A modern full-stack Django application to manage hackathons, contests, and team registrations efficiently.
 </p>
-
-### Web-Based Contest Registration and Management System
-
-A modern full-stack Django application built to efficiently manage college-level hackathons and coding contests with role-based access, team collaboration, and seamless registration workflows.
 
 ---
 
@@ -41,24 +41,16 @@ A modern full-stack Django application built to efficiently manage college-level
 
 <h2 align="center">📸 Screenshots</h2>
 
-<h3 align="center">🏠 Home</h3>
+<p align="center"><b>🏠 Home & 📊 Dashboard</b></p>
 <p align="center">
-  <img src="screenshots/home.png" width="700"/>
+  <img src="screenshots/home.png" width="45%"/>
+  <img src="screenshots/dashboard.png" width="45%"/>
 </p>
 
-<h3 align="center">📊 Dashboard</h3>
+<p align="center"><b>📁 Archive & 👥 Teams</b></p>
 <p align="center">
-  <img src="screenshots/dashboard.png" width="700"/>
-</p>
-
-<h3 align="center">📁 Archive</h3>
-<p align="center">
-  <img src="screenshots/archive.png" width="700"/>
-</p>
-
-<h3 align="center">👥 Teams</h3>
-<p align="center">
-  <img src="screenshots/teams.png" width="700"/>
+  <img src="screenshots/archive.png" width="45%"/>
+  <img src="screenshots/teams.png" width="45%"/>
 </p>
 
 ---
