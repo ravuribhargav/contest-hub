@@ -30,12 +30,10 @@ A full-stack Django web application designed to streamline the management of col
 
 ## 📸 Screenshots
 
-> *(Add screenshots here after uploading images to a `screenshots/` folder)*
-
 ```md
 ![Home](screenshots/home.png)
 ![Dashboard](screenshots/dashboard.png)
-![Contests](screenshots/contests.png)
+![Archive](screenshots/archive.png)
 ![Teams](screenshots/teams.png)
 ```
 
