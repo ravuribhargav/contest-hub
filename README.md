@@ -30,11 +30,19 @@ A full-stack Django web application designed to streamline the management of col
 
 ## 📸 Screenshots
 
-![Home](screenshots/home.png)
-![Dashboard](screenshots/dashboard.png)
-![Archive](screenshots/archive.png)
-![Teams](screenshots/teams.png)
-```
+<h2>📸 Screenshots</h2>
+
+<h3>🏠 Home</h3>
+<img src="screenshots/home.png" width="700"/>
+
+<h3>📊 Dashboard</h3>
+<img src="screenshots/dashboard.png" width="700"/>
+
+<h3>📁 Archive</h3>
+<img src="screenshots/archive.png" width="700"/>
+
+<h3>👥 Teams</h3>
+<img src="screenshots/teams.png" width="700"/>
 
 ---
 
