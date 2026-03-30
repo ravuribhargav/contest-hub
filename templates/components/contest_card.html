@@ -1,0 +1,52 @@
+{% load static %}
+<div class="contest-card">
+  <div class="contest-banner">
+    {% if contest.banner %}
+    <img src="{{ contest.banner.url }}" alt="{{ contest.title }}">
+    {% else %}
+    <div class="banner-placeholder">
+      {% if contest.category == "Hackathon" %}⚡{% elif contest.category == "Coding Contest" %}💻{% else %}🎓{% endif %}
+    </div>
+    {% endif %}
+    <div class="contest-badge-overlay">
+      {% with status=contest.get_status %}
+      <span class="ds-badge ds-status-{{ status|slugify }}">
+        {{ status }}
+      </span>
+      {% endwith %}
+    </div>
+  </div>
+
+  <div class="contest-content">
+    <span class="contest-category">
+      {{ contest.category }}
+    </span>
+
+    <h3 class="contest-title">
+      {{ contest.title }}
+    </h3>
+
+    <div class="contest-meta">
+      {% if show_ended_date %}
+      <span><i class="bi bi-calendar-check"></i> Ended {{ contest.end_date|date:"M d, Y" }}</span>
+      {% else %}
+      <span><i class="bi bi-calendar"></i> {{ contest.start_date|date:"M d, Y" }}</span>
+      {% endif %}
+      <span><i class="bi bi-geo-alt"></i> {{ contest.venue }}</span>
+    </div>
+
+    {% with status=contest.get_status %}
+      {% if user.is_authenticated and user.is_admin %}
+      <a href="{% url 'admin_panel:participants' contest.id %}" class="contest-btn contest-btn-outline">View Details &rarr;</a>
+      {% elif status == 'Registration Open' %}
+      <a href="{% url 'contests:detail' contest.id %}" class="contest-btn">Register Now</a>
+      {% elif status == 'Registration Closed' %}
+      <a href="{% url 'contests:detail' contest.id %}" class="contest-btn contest-btn-outline">View Details &rarr;</a>
+      {% elif status == 'Ongoing' %}
+      <a href="{% url 'contests:detail' contest.id %}" class="contest-btn">View Contest</a>
+      {% else %}
+      <a href="{% url 'contests:detail' contest.id %}" class="contest-btn contest-btn-outline">View Details &rarr;</a>
+      {% endif %}
+    {% endwith %}
+  </div>
+</div>

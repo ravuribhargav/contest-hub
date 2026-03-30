@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="ds-page-hero">
+  <div class="ds-container" style="display:flex;align-items:center;gap:1.1rem;">
+    <div class="ds-avatar {% if user.is_staff %}admin{% endif %}" style="width:52px;height:52px;font-size:1rem; overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;">
+      {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" class="profile-img" style="width:100%;height:100%;object-fit:cover;">
+      {% else %}
+        <img src="/static/images/default-avatar.png" class="profile-img" style="width:100%;height:100%;object-fit:cover;">
+      {% endif %}
+    </div>
+    <div>
+      <h1 style="font-size:1.5rem;">{{ user.get_full_name|default:user.username }}</h1>
+      <p style="margin:0;">@{{ user.username }} {% if user.is_staff %}<span class="ds-badge ds-badge-purple"
+          style="margin-left:0.3rem;">Admin</span>{% endif %}</p>
+    </div>
+  </div>
+</div>
+
+<div class="ds-container" style="padding-top:2rem;padding-bottom:3rem;">
+  
+  {% if not user.is_staff and not profile.profile_completed %}
+  <div class="ds-alert ds-alert-warning mb-4 shadow-sm" style="border-left: 5px solid var(--warning);">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+      <div>
+        <p class="mb-0">Please complete your profile to participate in contests.</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div style="max-width:980px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;align-items:start;">
+
+    <div class="ds-card">
+      <div class="ds-card-header">
+        <h2>Personal Information</h2>
+      </div>
+      <div class="ds-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="ds-form-group">
+            <label class="ds-form-label">Profile Picture</label>
+            <input type="file" name="profile_picture" class="ds-form-control" accept="image/*">
+            {% if profile.profile_picture %}
+              <small style="display:block;margin-top:0.5rem;color:var(--text-muted);">Current: <a href="{{ profile.profile_picture.url }}" target="_blank">View image</a></small>
+            {% endif %}
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="ds-form-group"><label class="ds-form-label">First Name</label><input type="text"
+                name="first_name" class="ds-form-control" value="{{ user.first_name }}"></div>
+            <div class="ds-form-group"><label class="ds-form-label">Last Name</label><input type="text" name="last_name"
+                class="ds-form-control" value="{{ user.last_name }}"></div>
+          </div>
+          <div class="ds-form-group {% if not user.email and not profile.profile_completed %}ds-field-missing{% endif %}">
+            <label class="ds-form-label">Email <span style="color:var(--danger);">*</span></label>
+            <input type="email" name="email" class="ds-form-control {% if not user.email and not profile.profile_completed %}border-danger{% endif %}" 
+                   value="{{ user.email }}" placeholder="your@email.com" required>
+            {% if not user.email and not profile.profile_completed %}
+            <small class="text-danger">Email is required for notifications.</small>
+            {% endif %}
+          </div>
+
+          {% if not user.is_staff %}
+          <!-- Student-only fields -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="ds-form-group">
+              <label class="ds-form-label">Branch <span style="color:var(--danger);">*</span></label>
+              <select name="branch" class="ds-form-control" required>
+                <option value="">— Select —</option>
+                {% for v,l in branches %}<option value="{{ v }}" {% if profile.branch == v %}selected{% endif %}>{{ l }}
+                </option>{% endfor %}
+              </select>
+            </div>
+            <div class="ds-form-group {% if not profile.year and not profile.profile_completed %}ds-field-missing{% endif %}">
+              <label class="ds-form-label">Year <span style="color:var(--danger);">*</span></label>
+              <select name="year" class="ds-form-control {% if not profile.year and not profile.profile_completed %}border-danger{% endif %}" required>
+                <option value="">— Select —</option>
+                {% for v,l in years %}<option value="{{ v }}" {% if profile.year == v %}selected{% endif %}>{{ l }}
+                </option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          
+          <div class="ds-form-group {% if not profile.section and not profile.profile_completed %}ds-field-missing{% endif %}">
+            <label class="ds-form-label">Section <span style="color:var(--danger);">*</span></label>
+            <input type="text" name="section" class="ds-form-control {% if not profile.section and not profile.profile_completed %}border-danger{% endif %}" 
+                   value="{{ profile.section|default:'' }}" placeholder="e.g. A, B, C" maxlength="5" required>
+            {% if not profile.section and not profile.profile_completed %}
+            <small class="text-danger">Section is required.</small>
+            {% endif %}
+          </div>
+          {% else %}
+          <!-- Admin-only fields -->
+          <div class="ds-form-group">
+            <label class="ds-form-label">Department</label>
+            <select name="department" class="ds-form-control">
+              <option value="">Select Department</option>
+              {% for value, label in branches %}
+              <option value="{{ value }}" {% if profile.department == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="ds-form-group">
+            <label class="ds-form-label">Bio (optional)</label>
+            <textarea name="bio" class="ds-form-control" rows="3" placeholder="A short bio...">{{ profile.bio|default:"" }}</textarea>
+          </div>
+          {% endif %}
+          <div class="ds-form-group {% if not profile.phone and not profile.profile_completed %}ds-field-missing{% endif %}">
+            <label class="ds-form-label">Phone <span style="color:var(--danger);">*</span></label>
+            <input type="tel" name="phone" class="ds-form-control {% if not profile.phone and not profile.profile_completed %}border-danger{% endif %}" 
+                   value="{{ profile.phone }}" placeholder="+91 XXXXX XXXXX" required>
+            {% if not profile.phone and not profile.profile_completed %}
+            <small class="text-danger">Phone number is required.</small>
+            {% endif %}
+          </div>
+
+          <div style="display:flex;gap:1rem;align-items:center;">
+            <button type="submit" class="ds-btn ds-btn-primary">Save Changes</button>
+            {% if profile.profile_picture %}
+            <button type="submit" name="remove_profile_picture" value="1" class="ds-btn ds-btn-danger">Remove Profile Picture</button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div>
+      <div class="ds-card">
+        <div class="ds-card-header">
+          <h2>Account</h2>
+        </div>
+        <div class="ds-card-body">
+          <div class="ds-meta-row"><span class="ds-meta-key">Username</span><span class="ds-meta-val" style="font-family:monospace; background:var(--bg-muted); padding:0.1rem 0.4rem; border-radius:4px;">
+              {{ user.username }}</span></div>
+          <div class="ds-meta-row"><span class="ds-meta-key">Role</span><span class="ds-meta-val">
+              {% if user.is_staff %}
+              <span class="ds-badge ds-badge-purple">Admin</span>{% else %}<span
+                class="ds-badge ds-badge-indigo">Student</span>{% endif %}</span></div>
+          {% if not user.is_staff %}
+          <div class="ds-meta-row"><span class="ds-meta-key">Branch</span><span class="ds-meta-val">
+              {{ profile.branch|default:"—" }}</span></div>
+          <div class="ds-meta-row"><span class="ds-meta-key">Year</span><span class="ds-meta-val">
+              {% if profile.year %}Year {{ profile.year }}{% else %}—{% endif %}</span></div>
+          <div class="ds-meta-row"><span class="ds-meta-key">Profile Status</span><span class="ds-meta-val">
+              {% if profile.profile_completed %}<span style="color:var(--success); font-weight: 600;">✓ Complete</span>{% else %}<span
+                style="color:var(--danger); font-weight: 600;">⚠ Incomplete</span>{% endif %}</span></div>
+          {% endif %}
+          <div class="ds-meta-row"><span class="ds-meta-key">Last Login</span><span class="ds-meta-val">
+              {{ user.last_login|date:"M d, Y H:i" }}</span></div>
+          <div class="ds-divider"></div>
+          <a href="{% url 'accounts:change_password' %}" class="ds-btn ds-btn-ghost"
+            style="width:100%;justify-content:center;"><i class="bi bi-key"></i> Change Password</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.ds-field-missing .ds-form-label {
+  color: #b91c1c;
+}
+
+.ds-field-missing .ds-form-control {
+  border-color: #fecaca !important;
+  background: #fff7f7;
+}
+
+@media (max-width: 900px) {
+  .ds-container > div[style*="max-width:980px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
+{% endblock %}

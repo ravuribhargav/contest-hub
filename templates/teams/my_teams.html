@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}My Teams{% endblock %}
+{% block content %}
+<div class="page-hero">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <div><h1>My Teams</h1><p>Teams you are a member of.</p></div>
+    <a href="{% url 'teams:join' %}" class="btn-g"><i class="bi bi-person-plus" style="margin-right:0.35rem;"></i>Join a Team</a>
+  </div>
+</div>
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+  {% if memberships %}
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;">
+    {% for m in memberships %}
+    <div class="team-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
+        <div>
+          <h3 style="font-size:1rem;font-weight:700;color:#1a1a2e;margin:0;">{{ m.team.name }}</h3>
+          <p style="font-size:0.78rem;color:#6b7280;margin:0.2rem 0 0;">{{ m.team.contest.title }}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
+          {% if m.team.leader == user %}
+            <span style="background:#fef9c3;color:#713f12;padding:0.18em 0.5em;border-radius:20px;font-size:0.68rem;font-weight:700;">👑 Leader</span>
+          {% endif %}
+          {% if m.team_is_registered %}
+            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1" style="font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; border: 1px solid rgba(25,135,84,0.15);">Registered</span>
+          {% else %}
+            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1" style="font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; border: 1px solid rgba(220,53,69,0.15);">Not Registered</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="team-code" style="display:block;margin-bottom:0.75rem;">{{ m.team.team_code }}</div>
+      <div style="font-size:0.75rem;color:#6b7280;margin-bottom:1rem;"><i class="bi bi-people"></i> {{ m.team.member_count }} member{{ m.team.member_count|pluralize }} &nbsp;·&nbsp; <i class="bi bi-calendar"></i> {{ m.team.created_at|date:"M d" }}</div>
+      <a href="{% url 'teams:detail' m.team.pk %}" class="btn-g" style="width:100%;justify-content:center;display:flex;font-size:0.85rem;">View Team →</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-ico"><i class="bi bi-people"></i></div><h3>No teams yet</h3><p>Create a team from a contest page or join with a team code.</p><a href="{% url 'teams:join' %}" class="btn-p" style="margin-top:1rem;display:inline-flex;">Join a Team</a></div>
+  {% endif %}
+</div>
+{% endblock %}

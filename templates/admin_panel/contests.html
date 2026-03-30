@@ -1,0 +1,70 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Contests{% endblock %}
+{% block content %}
+<div class="ds-page-hero">
+  <div class="ds-container"
+    style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h1>Contests</h1>
+      <p>Create and manage all contests on the platform.</p>
+    </div>
+    <a href="{% url 'admin_panel:contest_create' %}" class="ds-btn ds-btn-primary"><i class="bi bi-plus-lg"></i> New
+      Contest</a>
+  </div>
+</div>
+<div class="ds-container" style="padding-top:2rem;padding-bottom:3rem;">
+  <div class="ds-card">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th style="padding-left:1.5rem;">Title</th>
+          <th>Category</th>
+          <th>Type</th>
+          <th>Venue</th>
+          <th>Dates</th>
+          <th>Regs</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in contests %}
+        <tr class="table-row" data-href="{% url 'admin_panel:participants' c.pk %}" onclick="window.location=this.getAttribute('data-href');" style="cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+          <td style="padding-left:1.5rem;">
+            <div style="font-weight:700;color:var(--dark);">{{ c.title }}</div>
+            {% if c.is_featured %}<span style="font-size:0.68rem;color:var(--warning);font-weight:600;">⭐
+              Featured</span>{% endif %}
+          </td>
+          <td><span class="ds-cat ds-cat-{{ c.category|lower|cut:' ' }}">{{ c.category }}</span></td>
+          <td><span class="ds-tag" style="font-size:0.7rem;">{{ c.get_participation_type_display }}</span></td>
+          <td style="font-size:0.78rem;color:var(--text-muted);">{{ c.venue }}</td>
+          <td style="font-size:0.75rem;color:var(--text-muted);">{{ c.start_date|date:"M d" }} – {{ c.end_date|date:"M d, Y" }}</td>
+          <td style="font-weight:700;">{{ c.reg_count }}</td>
+          <td>{% with s=c.get_status %}<span class="ds-badge ds-status-{{ s|lower|cut:' ' }}">{{ s|title }}</span>{% endwith %}</td>
+          <td>
+            <div style="display:flex;gap:0.4rem;">
+              <a href="{% url 'admin_panel:contest_edit' c.pk %}" class="ds-btn ds-btn-ghost ds-btn-sm" title="Edit"><i
+                  class="bi bi-pencil"></i></a>
+              <a href="{% url 'admin_panel:participants' c.pk %}" class="ds-btn ds-btn-primary ds-btn-sm"
+                style="background:var(--primary);" title="View Details"><i class="bi bi-eye"></i></a>
+              <a href="{% url 'admin_panel:contest_delete' c.pk %}" class="ds-btn ds-btn-ghost ds-btn-sm text-danger"
+                style="color:var(--danger);" title="Delete"><i class="bi bi-trash"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">
+            <div class="ds-empty">
+              <div class="ds-empty-ico"><i class="bi bi-trophy"></i></div>
+              <h3>No contests yet</h3>
+              <p>Create your first contest.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+    .student-dashboard {
+        background: radial-gradient(circle at 8% 0%, #eff6ff 0, #f8fafc 34%, #f8fafc 100%);
+        min-height: calc(100vh - 64px);
+    }
+
+    .sd-hero {
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(140deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+        color: #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sd-hero::before {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.28), transparent 70%);
+        right: -90px;
+        top: -140px;
+    }
+
+    .sd-hero-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 1.25rem;
+        align-items: center;
+        padding: 1.85rem 0;
+    }
+
+    .sd-kicker {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #7dd3fc;
+        font-weight: 700;
+    }
+
+    .sd-title {
+        margin: 0.28rem 0;
+        color: #f8fafc;
+        font-size: clamp(1.45rem, 2vw, 1.95rem);
+        letter-spacing: -0.03em;
+    }
+
+    .sd-sub {
+        margin: 0;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        max-width: 560px;
+    }
+
+    .sd-hero-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+    }
+
+    .sd-overview {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.7rem;
+    }
+
+    .sd-metric {
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        border-radius: 14px;
+        padding: 0.85rem 0.8rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .sd-metric-num {
+        color: #f8fafc;
+        margin: 0;
+        font-weight: 800;
+        font-size: 1.35rem;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+    }
+
+    .sd-metric-lbl {
+        color: #cbd5e1;
+        margin: 0.2rem 0 0;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        font-weight: 600;
+    }
+
+    .sd-wrap {
+        padding: 1.6rem 0 2.5rem;
+    }
+
+    .sd-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+        gap: 1.1rem;
+        align-items: start;
+    }
+
+    .sd-main,
+    .sd-side {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .sd-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .sd-feature {
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        padding: 1.1rem;
+    }
+
+    .sd-feature-thumb {
+        width: 120px;
+        height: 90px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sd-feature-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .sd-feature h3 {
+        margin: 0.6rem 0 0.35rem;
+        font-size: 1.05rem;
+    }
+
+    .sd-feature p {
+        margin: 0;
+        font-size: 0.84rem;
+        color: #475569;
+    }
+
+    .sd-register-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .sd-reg-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.85rem;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        background: #fff;
+    }
+
+    .sd-reg-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(79, 70, 229, 0.3);
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .sd-reg-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 0.5rem;
+    }
+
+    .sd-reg-title {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.35;
+        color: #0f172a;
+    }
+
+    .sd-reg-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.7rem;
+        font-size: 0.76rem;
+        color: #64748b;
+    }
+
+    .sd-side .ds-card {
+        position: relative;
+    }
+
+    .sd-side .sd-card-sticky {
+        position: sticky;
+        top: 82px;
+    }
+
+    .sd-link-list {
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .sd-link-list a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 0.6rem 0.75rem;
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 0.82rem;
+    }
+
+    .sd-link-list a:hover {
+        border-color: rgba(79, 70, 229, 0.35);
+        background: #eef2ff;
+    }
+
+    .sd-mini-list {
+        padding: 0.2rem 1rem 1rem;
+    }
+
+    .sd-mini-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        gap: 0.6rem;
+    }
+
+    .sd-mini-item:last-child {
+        border-bottom: none;
+    }
+
+    .sd-mini-item h4 {
+        margin: 0;
+        font-size: 0.86rem;
+        color: #0f172a;
+    }
+
+    .sd-mini-item p {
+        margin: 0.16rem 0 0;
+        font-size: 0.75rem;
+        color: #64748b;
+        line-height: 1.3;
+    }
+
+    .sd-ann-list {
+        padding: 0.25rem 1rem 1rem;
+        max-height: 310px;
+        overflow: auto;
+    }
+
+    .sd-ann-item {
+        border-bottom: 1px solid #f1f5f9;
+        padding: 0.65rem 0;
+    }
+
+    .sd-ann-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .sd-ann-item p {
+        margin: 0 0 0.22rem;
+        color: #0f172a;
+        font-size: 0.81rem;
+        line-height: 1.45;
+    }
+
+    .sd-ann-item span {
+        color: #94a3b8;
+        font-size: 0.72rem;
+    }
+
+    @media (max-width: 1100px) {
+        .sd-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sd-side .sd-card-sticky {
+            position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sd-hero-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sd-overview {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .sd-feature {
+            grid-template-columns: 1fr;
+        }
+
+        .sd-feature-thumb {
+            width: 100%;
+            height: 140px;
+        }
+
+        .sd-register-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<section class="student-dashboard">
+    <div class="sd-hero">
+        <div class="ds-container sd-hero-grid">
+            <div>
+                <div class="sd-kicker">Student Workspace</div>
+                <h1 class="sd-title">Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
+                <p class="sd-sub">A streamlined command center for teams, registrations, and contest momentum.</p>
+                <div class="sd-hero-actions">
+                    <a href="{% url 'accounts:profile' %}" class="ds-btn ds-btn-secondary ds-btn-sm"><i class="bi bi-person"></i>My Profile</a>
+                    <a href="{% url 'contests:list' %}" class="ds-btn ds-btn-primary ds-btn-sm"><i class="bi bi-search"></i>Explore Contests</a>
+                </div>
+            </div>
+
+            <div class="sd-overview">
+                <article class="sd-metric">
+                    <p class="sd-metric-num">{{ team_count }}</p>
+                    <p class="sd-metric-lbl">Teams</p>
+                </article>
+                <article class="sd-metric">
+                    <p class="sd-metric-num">{{ registration_count }}</p>
+                    <p class="sd-metric-lbl">Registrations</p>
+                </article>
+                <article class="sd-metric">
+                    <p class="sd-metric-num">{% if upcoming_contest %}1{% else %}0{% endif %}</p>
+                    <p class="sd-metric-lbl">Upcoming</p>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <div class="ds-container sd-wrap">
+        <div class="sd-layout">
+            <main class="sd-main">
+                {% if upcoming_contest %}
+                <div class="ds-card sd-card">
+                    <div class="ds-card-header">
+                        <h2><i class="bi bi-stars" style="margin-right:0.45rem;color:#6366f1;"></i>Featured Next Contest</h2>
+                    </div>
+                    <a href="{% url 'contests:detail' upcoming_contest.id %}" class="sd-feature">
+                        <div class="sd-feature-thumb">
+                            {% if upcoming_contest.banner %}
+                            <img src="{{ upcoming_contest.banner.url }}" alt="{{ upcoming_contest.title }}">
+                            {% else %}
+                            <i class="bi bi-trophy" style="font-size:1.75rem;color:#94a3b8;"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="ds-badge ds-status-upcoming">Upcoming</span>
+                            <h3>{{ upcoming_contest.title }}</h3>
+                            <p><i class="bi bi-calendar-event"></i> {{ upcoming_contest.start_date|date:"M d, Y" }} &nbsp; <i class="bi bi-geo-alt"></i> {{ upcoming_contest.venue }}</p>
+                        </div>
+                        <i class="bi bi-arrow-right-circle" style="font-size:1.3rem;color:#6366f1;"></i>
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="ds-card sd-card">
+                    <div class="ds-card-header">
+                        <h2><i class="bi bi-check2-circle" style="margin-right:0.45rem;color:#059669;"></i>Recent Registrations</h2>
+                        <a href="{% url 'registrations:my_registrations' %}" class="ds-see-all">View all</a>
+                    </div>
+                    {% if registrations %}
+                    <div class="sd-register-grid">
+                        {% for reg in registrations|slice:":4" %}
+                        <a href="{% url 'contests:detail' reg.contest.id %}" class="sd-reg-item">
+                            <div class="sd-reg-head">
+                                <h4 class="sd-reg-title">{{ reg.contest.title }}</h4>
+                                {% if reg.is_team %}
+                                <span class="badge bg-primary-subtle text-primary">Team</span>
+                                {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary">Individual</span>
+                                {% endif %}
+                            </div>
+                            <div class="sd-reg-foot">
+                                <span>{{ reg.contest.start_date|date:"M d, Y" }}</span>
+                                {% with s=reg.contest.get_status %}
+                                <span class="badge-status st-{{ s|slugify }}">{{ s }}</span>
+                                {% endwith %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="ds-empty" style="padding:2.1rem 1rem;">
+                        <div class="ds-empty-ico"><i class="bi bi-clipboard-x"></i></div>
+                        <h3>No registrations found</h3>
+                    </div>
+                    {% endif %}
+                </div>
+            </main>
+
+            <aside class="sd-side">
+                <div class="ds-card sd-card sd-card-sticky">
+                    <div class="ds-card-header">
+                        <h2><i class="bi bi-lightning-charge" style="margin-right:0.45rem;color:#8b5cf6;"></i>Quick Actions</h2>
+                    </div>
+                    <div class="ds-card-body" style="padding:1rem;">
+                        <div class="sd-link-list">
+                            <a href="{% url 'teams:my_teams' %}"><span><i class="bi bi-diagram-3"></i> My Teams</span><i class="bi bi-arrow-right"></i></a>
+                            <a href="{% url 'registrations:my_registrations' %}"><span><i class="bi bi-card-checklist"></i> My Registrations</span><i class="bi bi-arrow-right"></i></a>
+                            <a href="{% url 'accounts:profile' %}"><span><i class="bi bi-person-circle"></i> Account Profile</span><i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ds-card sd-card">
+                    <div class="ds-card-header">
+                        <h2><i class="bi bi-people" style="margin-right:0.45rem;color:#0ea5e9;"></i>My Teams</h2>
+                        <a href="{% url 'teams:my_teams' %}" class="ds-see-all">Manage</a>
+                    </div>
+                    {% if teams %}
+                    <div class="sd-mini-list">
+                        {% for tm in teams|slice:":3" %}
+                        <div class="sd-mini-item">
+                            <div>
+                                <h4>{{ tm.name }}</h4>
+                                <p>{{ tm.contest.title }}</p>
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary">{{ tm.team_members.count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="ds-empty" style="padding:1.8rem 1rem;">
+                        <div class="ds-empty-ico"><i class="bi bi-people"></i></div>
+                        <h3>No teams yet</h3>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="ds-card sd-card">
+                    <div class="ds-card-header">
+                        <h2><i class="bi bi-megaphone" style="margin-right:0.45rem;color:#f59e0b;"></i>Announcements</h2>
+                    </div>
+                    {% if announcements %}
+                    <div class="sd-ann-list">
+                        {% for ann in announcements %}
+                        <div class="sd-ann-item">
+                            <p>{{ ann.text }}</p>
+                            <span>{{ ann.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="ds-empty" style="padding:1.8rem 1rem;">
+                        <div class="ds-empty-ico"><i class="bi bi-chat-square-text"></i></div>
+                        <h3>No updates yet</h3>
+                    </div>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

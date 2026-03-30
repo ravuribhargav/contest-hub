@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Leave Team - {{ team.name }}{% endblock %}
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <div class="bc"><a href="{% url 'teams:my_teams' %}">My Teams</a><span class="sep">/</span><span>{{ team.name }}</span><span class="sep">/</span><span>Leave</span></div>
+  </div>
+</div>
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;max-width:600px;margin:0 auto;">
+  <div class="sidebar-card" style="border-top:4px solid #ef4444;text-align:center;">
+    <div style="font-size:3.5rem;color:#ef4444;margin-bottom:1.5rem;">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h1 style="font-size:1.8rem;margin-bottom:1rem;">Leave Team?</h1>
+    <p style="color:#6b7280;margin-bottom:2rem;line-height:1.6;">
+      Are you sure you want to leave <strong>"{{ team.name }}"</strong>? You will no longer be part of this team.
+    </p>
+
+    <form method="post" style="display:flex;gap:1rem;justify-content:center;">
+      {% csrf_token %}
+      <a href="{% url 'teams:detail' team.pk %}" class="ds-btn ds-btn-ghost" style="padding:0 2rem;height:48px;line-height:46px;">Cancel</a>
+      <button type="submit" class="ds-btn ds-btn-primary" style="background:#ef4444;border-color:#ef4444;padding:0 2rem;height:48px;">
+        Yes, Leave Team
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

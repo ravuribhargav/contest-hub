@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="ds-container">
+    <h1>INNOVATE • PARTICIPATE • COLLABORATE</h1>
+    <p>The official platform for managing hackathons and coding contests.</p>
+    <div class="hero-actions">
+      <a href="{% url 'contests:list' %}" class="ds-btn ds-btn-primary ds-btn-lg">Browse Contests</a>
+      <a href="{% url 'contests:archive' %}" class="ds-btn ds-btn-ghost ds-btn-lg">View Archive</a>
+    </div>
+  </div>
+</section>
+
+<!-- PRIMARY CONTEST COUNTDOWN -->
+{% if primary_contest %}
+<section class="ds-container" style="margin-top:2.5rem;">
+  <div class="featured" style="position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:linear-gradient(130deg,rgba(99,102,241,0.12),rgba(0,0,0,0));pointer-events:none;"></div>
+    <div style="position:absolute;top:1rem;right:1rem;z-index:2;">
+      {% if primary_contest.ui_status == 'ONGOING' %}
+      <span class="ds-badge ds-status-ongoing hero-float-badge">🟢 Ongoing</span>
+      {% elif primary_contest.ui_status == 'REGISTRATION_OPEN' %}
+      <span class="ds-badge ds-status-registration-open hero-float-badge">Registration Open</span>
+      {% elif primary_contest.ui_status == 'REGISTRATION_CLOSED' %}
+      <span class="ds-badge ds-status-registration-closed hero-float-badge">Registration Closed</span>
+      {% else %}
+      <span class="ds-badge ds-status-completed hero-float-badge">Completed</span>
+      {% endif %}
+    </div>
+    <div class="featured-grid featured-section">
+      <div>
+        <div class="featured-title">{{ primary_contest.title }}</div>
+        <div class="featured-meta"><i class="bi bi-geo-alt-fill"></i> {{ primary_contest.venue }}</div>
+        {% if primary_contest.ui_status == 'COMPLETED' %}
+        <div class="featured-meta"><i class="bi bi-calendar-check"></i> Ended {{ primary_contest.end_date|date:"F d, Y · g:i A" }}</div>
+        {% else %}
+        <div class="featured-meta"><i class="bi bi-calendar-event"></i> Starts {{ primary_contest.start_date|date:"F d, Y · g:i A" }}</div>
+        {% endif %}
+        <div style="margin-top:0.9rem;display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 0.85rem;border-radius:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);">
+          <i class="bi bi-people-fill" style="font-size:1rem;"></i>
+          <div>
+            <div style="font-size:0.76rem;color:#cbd5e1;line-height:1;">Total Participants</div>
+            <div style="font-size:1.22rem;font-weight:800;line-height:1.2;">{{ primary_total_participants }}</div>
+            <div style="font-size:0.66rem;color:#94a3b8;" title="Includes all team members for team contests">Includes all team members</div>
+          </div>
+        </div>
+
+        {% if primary_contest.ui_status == 'REGISTRATION_OPEN' %}
+        <div style="margin-top:1rem;">
+          <span class="ds-badge ds-status-registration-open">Registration Open</span>
+        </div>
+        <div class="featured-actions">
+          <a href="{% url 'contests:detail' primary_contest.pk %}" class="ds-btn btn-register">Register Now</a>
+        </div>
+        {% elif primary_contest.ui_status == 'ONGOING' %}
+        <div style="margin-top:1rem;">
+          <span class="ds-badge ds-status-ongoing" style="box-shadow:0 0 20px rgba(34,197,94,0.3);">🟢 Ongoing</span>
+        </div>
+        <div style="margin-top:0.4rem;font-weight:700;font-size:1.05rem;">Contest is Live Now 🚀</div>
+        <div class="featured-actions">
+          <a href="{% url 'contests:detail' primary_contest.pk %}" class="ds-btn btn-register">View Live Contest</a>
+        </div>
+        {% elif primary_contest.ui_status == 'COMPLETED' %}
+        <div style="margin-top:1rem;">
+          <span class="ds-badge ds-status-completed">Contest Completed</span>
+        </div>
+        <div class="featured-actions">
+          <a href="{% url 'contests:detail' primary_contest.pk %}" class="ds-btn btn-view" style="justify-content:center;display:inline-flex;">View Details →</a>
+        </div>
+        {% else %}
+        <div style="margin-top:1rem;">
+          <span class="ds-badge ds-status-registration-closed">Registration Closed</span>
+        </div>
+        <div class="featured-actions">
+          <a href="{% url 'contests:detail' primary_contest.pk %}" class="ds-btn btn-view" style="justify-content:center;display:inline-flex;">View Details →</a>
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        {% if primary_contest.ui_status == 'ONGOING' and primary_contest.ui_countdown_target %}
+        <div class="featured-countdown-label">Ends In</div>
+        <div id="countdown" data-deadline="{{ primary_contest.ui_countdown_target|date:'c' }}" class="countdown-container">
+          <div class="time-box"><span id="days">00</span><small>DAYS</small></div>
+          <div class="time-box"><span id="hours">00</span><small>HOURS</small></div>
+          <div class="time-box"><span id="minutes">00</span><small>MINUTES</small></div>
+          <div class="time-box"><span id="seconds">00</span><small>SECONDS</small></div>
+        </div>
+        {% elif is_spot_registration_active %}
+        <div class="text-center" style="margin-top:1rem;">
+          {% if is_late_entry_active %}
+          <div class="spot-banner text-center">⚡ Late Entry Open</div>
+          {% else %}
+          <div class="spot-banner text-center">🔥 Spot Registration Open Now</div>
+          {% endif %}
+        </div>
+        {% elif primary_contest.ui_countdown_target %}
+        <div class="featured-countdown-label">{{ primary_contest.ui_countdown_label }}</div>
+        <div id="countdown" data-deadline="{{ primary_contest.ui_countdown_target|date:'c' }}" class="countdown-container">
+          <div class="time-box"><span id="days">00</span><small>DAYS</small></div>
+          <div class="time-box"><span id="hours">00</span><small>HOURS</small></div>
+          <div class="time-box"><span id="minutes">00</span><small>MINUTES</small></div>
+          <div class="time-box"><span id="seconds">00</span><small>SECONDS</small></div>
+        </div>
+        {% elif primary_contest.ui_status == 'COMPLETED' %}
+        <div class="featured-countdown-label" style="text-align:right;">Contest Completed</div>
+        {% if not user.is_authenticated or not user.is_admin %}
+        <div class="countdown-container" style="justify-content:flex-end;">
+          <div class="time-box" style="min-width:220px;"><span style="font-size:1rem;">Thanks for participating</span></div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="countdown-container" style="justify-content:flex-end;"></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CONTEST SEARCH -->
+<section class="ds-section-alt" style="padding:2.5rem 0;border-bottom:1px solid var(--border);">
+  <div class="ds-container">
+    <div
+      style="text-align:center;margin-bottom:0.85rem;font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.12em;">
+      Find a Contest</div>
+    <form id="home-search">
+      <div class="ds-search-wrap">
+        <span class="ds-search-ico"><i class="bi bi-search"></i></span>
+        <input type="text" class="ds-search-inp" placeholder="Search by title, category, or venue..." id="search-input"
+          autocomplete="off">
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- STATISTICS -->
+<section style="padding:3.5rem 0;background:var(--bg-muted);">
+  <div class="ds-container">
+    <div class="ds-grid ds-grid-4">
+      <div class="ds-stat">
+        <div class="ds-stat-icon" style="background:#EFF6FF;"><i class="bi bi-trophy"
+            style="color:#2563EB;font-size:1.3rem;"></i></div>
+        <div class="ds-stat-num" data-target="{{ total_contests }}">{{ total_contests }}</div>
+        <div class="ds-stat-lbl">Total Contests</div>
+      </div>
+      <div class="ds-stat">
+        <div class="ds-stat-icon" style="background:#F0FDF4;"><i class="bi bi-people"
+            style="color:#059669;font-size:1.3rem;"></i></div>
+        <div class="ds-stat-num" data-target="{{ total_participants }}">{{ total_participants }}</div>
+          <div class="ds-stat-lbl">Total Participants</div>
+          <div style="font-size:0.68rem;color:#64748b;margin-top:0.3rem;" title="Includes all team members">Includes all team members</div>
+      </div>
+      <div class="ds-stat">
+        <div class="ds-stat-icon" style="background:var(--accent-light);"><i class="bi bi-diagram-3"
+            style="color:#7C3AED;font-size:1.3rem;"></i></div>
+        <div class="ds-stat-num" data-target="{{ total_teams_participated }}">{{ total_teams_participated }}</div>
+        <div class="ds-stat-lbl">Total Teams Participated</div>
+      </div>
+      <div class="ds-stat">
+        <div class="ds-stat-icon" style="background:#FFF7ED;"><i class="bi bi-lightning-charge"
+            style="color:var(--warning);font-size:1.3rem;"></i></div>
+        <div class="ds-stat-num" data-target="{{ active_contests }}">{{ active_contests }}</div>
+        <div class="ds-stat-lbl">Active Contests</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED CONTESTS -->
+{% if featured %}
+<section class="ds-section ds-section-alt">
+  <div class="ds-container">
+    <div class="ds-section-hdr">
+      <div>
+        <div class="ds-eyebrow">Highlighted</div>
+        <h2>Featured Contests</h2>
+      </div>
+      <a href="{% url 'contests:list' %}" class="ds-see-all">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="contest-grid">
+      {% for c in featured %}
+      {% include "components/contest_card.html" with contest=c %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ONGOING CONTESTS -->
+{% if ongoing %}
+<section class="ds-section" style="background:var(--bg-muted);">
+  <div class="ds-container">
+    <div class="ds-section-hdr">
+      <div>
+        <div class="ds-eyebrow" style="color:var(--info);">Live Now</div>
+        <h2>Ongoing Contests</h2>
+      </div>
+    </div>
+    <div class="contest-grid">
+      {% for c in ongoing %}
+      {% include "components/contest_card.html" with contest=c %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- UPCOMING CONTESTS -->
+{% if upcoming or not ongoing %}
+<section class="ds-section ds-section-alt">
+  <div class="ds-container">
+    <div class="ds-section-hdr">
+      <div>
+        <div class="ds-eyebrow">Coming Soon</div>
+        <h2>Upcoming Contests</h2>
+      </div>
+      <a href="{% url 'contests:list' %}" class="ds-see-all">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    {% if upcoming %}
+    <div class="contest-grid">
+      {% for c in upcoming %}
+      {% include "components/contest_card.html" with contest=c %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="margin:0;color:#64748b;font-weight:500;">No upcoming contests available at the moment.</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- RECENTLY COMPLETED -->
+{% if recent_completed %}
+<section class="ds-section" style="background:var(--bg-muted);">
+  <div class="ds-container">
+    <div class="ds-section-hdr">
+      <div>
+        <div class="ds-eyebrow">Concluded</div>
+        <h2>Recently Completed</h2>
+      </div>
+      <a href="{% url 'contests:archive' %}" class="ds-see-all">Full archive <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="contest-grid">
+      {% for contest in recent_completed %}
+      {% include "components/contest_card.html" with contest=contest show_ended_date=True %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- HOW IT WORKS -->
+<section class="ds-section ds-section-alt">
+  <div class="ds-container">
+    <div class="ds-section-hdr" style="justify-content:center;text-align:center;">
+      <div>
+        <div class="ds-eyebrow">How It Works</div>
+        <h2 style="margin-bottom:0.45rem;">Participate In 3 Simple Steps</h2>
+        <p style="max-width:640px;margin:0 auto;">From discovery to participation, the workflow stays clean and fast for every student.</p>
+      </div>
+    </div>
+    <div class="ds-grid ds-grid-3" style="margin-top:1rem;">
+      <div class="ds-step">
+        <div class="ds-step-n">1</div>
+        <h4>Find a Contest</h4>
+        <p>Browse by category, venue, and status to pick the right contest.</p>
+      </div>
+      <div class="ds-step">
+        <div class="ds-step-n">2</div>
+        <h4>Register Solo or Team</h4>
+        <p>Create a team or join using a team code before the deadline.</p>
+      </div>
+      <div class="ds-step">
+        <div class="ds-step-n">3</div>
+        <h4>Track From Dashboard</h4>
+        <p>Monitor registrations, teams, and live contest updates in one place.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM HIGHLIGHTS -->
+<section class="ds-section ds-section-muted">
+  <div class="ds-container">
+    <div class="ds-section-hdr" style="justify-content:center;text-align:center;">
+      <div>
+        <div class="ds-eyebrow">Why Contest Hub</div>
+        <h2 style="margin-bottom:0.45rem;">Built For Real Campus Competitions</h2>
+      </div>
+    </div>
+    <div class="ds-grid ds-grid-3" style="margin-top:1rem;">
+      <div class="ds-feat">
+        <div class="ds-feat-ico"><i class="bi bi-lightning-charge"></i></div>
+        <h4>Fast Registrations</h4>
+        <p>Seamless registration experience with clear status and deadlines.</p>
+      </div>
+      <div class="ds-feat">
+        <div class="ds-feat-ico"><i class="bi bi-shield-check"></i></div>
+        <h4>Role-Based Access</h4>
+        <p>Students and admins get dedicated interfaces without workflow clutter.</p>
+      </div>
+      <div class="ds-feat">
+        <div class="ds-feat-ico"><i class="bi bi-graph-up-arrow"></i></div>
+        <h4>Live Visibility</h4>
+        <p>Track active contests, team progress, and participation insights instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const el = document.getElementById("countdown");
+  if (!el) return;
+
+  const deadline = new Date(el.dataset.deadline).getTime();
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = deadline - now;
+
+    if (diff <= 0 || Number.isNaN(deadline)) {
+      el.innerHTML = "<span style='color:#cbd5e1;font-size:0.82rem;'>Updating status…</span>";
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById("days").textContent = String(days).padStart(2, '0');
+    document.getElementById("hours").textContent = String(hours).padStart(2, '0');
+    document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+    document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+});
+</script>
+
+<style>
+.hero-float-badge {
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.22);
+  backdrop-filter: blur(4px);
+}
+</style>
+{% endblock %}

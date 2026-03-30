@@ -1,0 +1,162 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Bulk User Upload{% endblock %}
+{% block content %}
+<div class="ds-page-hero">
+    <div class="ds-container">
+        <div class="ds-bc">
+            <a href="{% url 'admin_panel:users' %}">Users</a>
+            <span class="ds-bc-sep">›</span>
+            <span>Bulk Upload</span>
+        </div>
+        <h1>Bulk User Upload</h1>
+        <p>Upload a CSV file to create multiple student accounts at once.</p>
+    </div>
+</div>
+
+<div class="ds-container" style="padding-top:2.5rem;padding-bottom:4rem;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+
+        <!-- UPLOAD FORM -->
+        <div class="ds-card">
+            <div class="ds-card-header">
+                <h2><i class="bi bi-cloud-upload" style="color:var(--primary);margin-right:0.4rem;"></i>Upload CSV File
+                </h2>
+            </div>
+            <div class="ds-card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="ds-form-group">
+                        <label class="ds-form-label">CSV File <span style="color:var(--danger);">*</span></label>
+                        <input type="file" name="csv_file" accept=".csv" class="ds-form-control" required>
+                        <div class="ds-form-hint">Only .csv files. Encoding: UTF-8.</div>
+                    </div>
+                    <button type="submit" class="ds-btn ds-btn-primary" style="width:100%;justify-content:center;">
+                        <i class="bi bi-upload"></i> Upload &amp; Create Users
+                    </button>
+                </form>
+
+                <div class="ds-divider"></div>
+
+                <!-- FORMAT GUIDE -->
+                <div style="background:var(--bg-muted);border-radius:var(--radius);padding:1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:var(--dark);margin-bottom:0.6rem;">
+                        <i class="bi bi-file-earmark-text"
+                            style="margin-right:0.3rem;color:var(--primary);"></i>Expected CSV Format
+                    </div>
+                    <pre
+                        style="font-family:'Courier New',monospace;font-size:0.78rem;color:var(--text-secondary);margin:0;white-space:pre-wrap;background:white;border:1px solid var(--border);border-radius:8px;padding:0.75rem;"><strong>reg_no</strong>
+y21cs001
+l23it005
+y24cd100
+y22cm150</pre>
+                    <ul
+                        style="font-size:0.75rem;color:var(--text-muted);margin-top:0.75rem;padding-left:1.1rem;line-height:1.8;">
+                        <li><strong>reg_no</strong> — unique registration number</li>
+                        <li><strong>Academic Details</strong> — Derived automatically</li>
+                        <li><strong>Default password</strong> — same as reg_no</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div>
+            {% if results %}
+            <div class="ds-card" style="margin-bottom:1.25rem;">
+                <div class="ds-card-header">
+                    <h2>Upload Summary</h2>
+                    <span class="ds-badge ds-badge-green">Complete</span>
+                </div>
+                <div class="ds-card-body">
+                    <div class="ds-grid ds-grid-3" style="gap:1rem;margin-bottom:1rem;">
+                        <div
+                            style="text-align:center;background:var(--success-bg);border-radius:var(--radius);padding:1rem;">
+                            <div style="font-size:2rem;font-weight:800;color:var(--success-text);">{{                 results.created|length }}</div>
+                            <div
+                                style="font-size:0.72rem;font-weight:600;color:var(--success-text);text-transform:uppercase;letter-spacing:0.06em;">
+                                Created</div>
+                        </div>
+                        <div
+                            style="text-align:center;background:var(--warning-bg);border-radius:var(--radius);padding:1rem;">
+                            <div style="font-size:2rem;font-weight:800;color:var(--warning-text);">{{                 results.skipped|length }}</div>
+                            <div
+                                style="font-size:0.72rem;font-weight:600;color:var(--warning-text);text-transform:uppercase;letter-spacing:0.06em;">
+                                Skipped</div>
+                        </div>
+                        <div
+                            style="text-align:center;background:var(--danger-bg);border-radius:var(--radius);padding:1rem;">
+                            <div style="font-size:2rem;font-weight:800;color:var(--danger-text);">{{                 results.errors|length }}</div>
+                            <div
+                                style="font-size:0.72rem;font-weight:600;color:var(--danger-text);text-transform:uppercase;letter-spacing:0.06em;">
+                                Errors</div>
+                        </div>
+                    </div>
+
+                    {% if results.created %}
+                    <div style="margin-bottom:1rem;">
+                        <div
+                            style="font-size:0.72rem;font-weight:700;color:var(--success-text);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">
+                            ✓ Created Users</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.35rem;">
+                            {% for u in results.created %}<span class="ds-badge ds-badge-green">{{ u }}</span>{% endfor        %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if results.skipped %}
+                    <div style="margin-bottom:1rem;">
+                        <div
+                            style="font-size:0.72rem;font-weight:700;color:var(--warning-text);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">
+                            ⚠ Already Existed (skipped)</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.35rem;">
+                            {% for u in results.skipped %}<span class="ds-badge ds-badge-yellow">{{ u }}</span>{% endfor        %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if results.errors %}
+                    <div>
+                        <div
+                            style="font-size:0.72rem;font-weight:700;color:var(--danger-text);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">
+                            ✗ Errors</div>
+                        {% for e in results.errors %}<div
+                            style="font-size:0.8rem;color:var(--danger-text);padding:0.35rem 0;border-bottom:1px solid var(--danger-bg);">
+                            {{ e }}</div>{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div style="margin-top:1rem;">
+                        <a href="{% url 'admin_panel:users' %}" class="ds-btn ds-btn-primary ds-btn-sm">View All Users
+                            →</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="ds-card">
+                <div class="ds-card-body">
+                    <div class="ds-empty" style="padding:2.5rem 1rem;">
+                        <div class="ds-empty-ico"><i class="bi bi-cloud-upload"></i></div>
+                        <h3>No upload yet</h3>
+                        <p>Upload a CSV file to see results here.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="ds-card" style="margin-top:1.25rem;">
+                <div class="ds-card-body" style="padding:1rem 1.25rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;"><i
+                            class="bi bi-info-circle" style="color:var(--primary);margin-right:0.3rem;"></i>Notes</div>
+                    <ul style="font-size:0.75rem;color:var(--text-muted);padding-left:1.1rem;line-height:1.9;margin:0;">
+                        <li>Existing usernames are safely skipped</li>
+                        <li>Default password equals the username — prompt users to change it</li>
+                        <li>Uploaded users are regular students (not staff)</li>
+                        <li>You can deactivate users later from the Users page</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

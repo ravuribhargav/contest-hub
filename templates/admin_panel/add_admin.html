@@ -1,0 +1,89 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Add Admin{% endblock %}
+{% block content %}
+<div class="ds-page-hero">
+  <div class="ds-container">
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+      <a href="{% url 'admin_panel:users' %}" class="ds-btn ds-btn-ghost" style="padding:0.4rem 0.6rem;"><i class="bi bi-arrow-left"></i> Back to Users</a>
+    </div>
+    <h1>Add New Admin</h1>
+    <p>Create a new staff account with administrative privileges.</p>
+  </div>
+</div>
+
+<div class="ds-container" style="padding-top:2rem;padding-bottom:3rem;">
+  <div class="ds-card" style="max-width:800px;margin:0 auto;">
+    <div class="ds-card-header">
+      <h2>Admin Details</h2>
+    </div>
+    <div class="ds-card-body">
+      <form method="post" action="{% url 'admin_panel:add_admin' %}">
+        {% csrf_token %}
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+          <div class="ds-form-group">
+            <label class="ds-form-label">First Name (optional)</label>
+            <input type="text" name="first_name" class="ds-form-control" placeholder="John">
+          </div>
+          <div class="ds-form-group">
+            <label class="ds-form-label">Last Name (optional)</label>
+            <input type="text" name="last_name" class="ds-form-control" placeholder="Doe">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+          <div class="ds-form-group">
+            <label class="ds-form-label">Username <span style="color:var(--danger);">*</span></label>
+            <input type="text" name="username" class="ds-form-control" required placeholder="admin_johndoe">
+          </div>
+          <div class="ds-form-group">
+            <label class="ds-form-label">Email <span style="color:var(--danger);">*</span></label>
+            <input type="email" name="email" class="ds-form-control" required placeholder="john@example.com">
+          </div>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+          <div class="ds-form-group">
+            <label class="ds-form-label">Password <span style="color:var(--danger);">*</span></label>
+            <input type="password" name="password" class="ds-form-control" required placeholder="••••••••">
+          </div>
+          <div class="ds-form-group">
+            <label class="ds-form-label">Confirm Password <span style="color:var(--danger);">*</span></label>
+            <input type="password" name="confirm_password" class="ds-form-control" required placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="ds-divider" style="margin:2rem 0;"></div>
+
+        <h3 style="font-size:1.1rem;margin-bottom:1rem;">Additional Information</h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+          <div class="ds-form-group">
+            <label class="ds-form-label">Phone Number (optional)</label>
+            <input type="text" name="phone" class="ds-form-control" placeholder="+1234567890">
+          </div>
+          <div class="ds-form-group">
+            <label class="ds-form-label">Department (optional)</label>
+            <select name="department" class="ds-form-control">
+              <option value="">Select Department</option>
+              {% for value, label in branch_choices %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="ds-form-group" style="margin-bottom:2rem;">
+          <label class="ds-form-label">Bio (optional)</label>
+          <textarea name="bio" class="ds-form-control" rows="3" placeholder="A short bio..."></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:1rem;">
+          <a href="{% url 'admin_panel:users' %}" class="ds-btn ds-btn-ghost">Cancel</a>
+          <button type="submit" class="ds-btn ds-btn-primary">Create Admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

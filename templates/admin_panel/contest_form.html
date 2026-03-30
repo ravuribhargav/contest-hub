@@ -1,0 +1,526 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}{{ action }} Contest{% endblock %}
+{% block content %}
+<div class="admin-ph">
+  <div class="container">
+    <div class="bc"><a href="{% url 'admin_panel:contests' %}">Contests</a><span class="sep">/</span><span>{{ action }}</span></div>
+    <h1>{{ action }} Contest</h1>
+  </div>
+</div>
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+  <div style="max-width:820px;">
+    <style>
+      .organizer-search-wrap {
+        position: relative;
+      }
+
+      .organizer-suggestions {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 40;
+        display: none;
+      }
+
+      .organizer-suggestions.open {
+        display: block;
+      }
+
+      .organizer-item {
+        width: 100%;
+        border: none;
+        background: #ffffff;
+        text-align: left;
+        padding: 0.6rem 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+
+      .organizer-item:hover,
+      .organizer-item.active {
+        background: #eef2ff;
+      }
+
+      .organizer-item mark {
+        background: #ddd6fe;
+        color: #4c1d95;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+
+      .organizer-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-top: 0.6rem;
+      }
+
+      .organizer-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 20px;
+        padding: 6px 10px;
+        font-size: 13px;
+        font-weight: 600;
+        background: #ede9fe;
+        color: #4c1d95;
+        border: 1px solid #c4b5fd;
+      }
+
+      .organizer-chip button {
+        border: none;
+        background: transparent;
+        color: #5b21b6;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0;
+      }
+
+      .organizer-empty {
+        font-size: 0.78rem;
+        color: #64748b;
+        margin-top: 0.55rem;
+      }
+
+      .field-error {
+        color: #dc2626;
+        font-size: 0.78rem;
+        margin-top: 0.35rem;
+      }
+
+      .form-ctl.input-error {
+        border-color: #dc2626;
+      }
+    </style>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="panel" style="margin-bottom:1.25rem;">
+        <div class="panel-header"><h2>Basic Information</h2></div>
+        <div class="panel-body">
+          <div class="form-group"><label class="form-lbl">Title *</label><input type="text" name="title" class="form-ctl" value="{{ contest.title|default:'' }}" required></div>
+          <div class="form-group"><label class="form-lbl">Description *</label><textarea name="description" class="form-ctl" rows="4" required>{{ contest.description|default:'' }}</textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-lbl">Category *</label>
+              <select name="category" class="form-ctl" required>
+                <option value="">— Select —</option>
+                <option value="Hackathon" {% if contest.category == "Hackathon" %}selected{% endif %}>Hackathon</option>
+                <option value="Coding Contest" {% if contest.category == "Coding Contest" %}selected{% endif %}>Coding Contest</option>
+                <option value="Workshop" {% if contest.category == "Workshop" %}selected{% endif %}>Workshop</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-lbl">Venue *</label><input type="text" name="venue" class="form-ctl" value="{{ contest.venue|default:'' }}" required></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-lbl">Participation Type *</label>
+              <select id="participation_type" name="participation_type" class="form-ctl" required>
+                <option value="solo" {% if contest.participation_type == "solo" %}selected{% endif %}>Solo</option>
+                <option value="team" {% if contest.participation_type == "team" or contest.participation_type == "both" %}selected{% endif %}>Team</option>
+              </select>
+            </div>
+            <div id="team_size_min_group" class="form-group"><label class="form-lbl">Min Team Size</label><input id="team_size_min" type="number" name="team_size_min" class="form-ctl" value="{{ contest.team_size_min|default:2 }}" min="1"></div>
+            <div id="team_size_max_group" class="form-group"><label class="form-lbl">Max Team Size</label><input id="team_size_max" type="number" name="team_size_max" class="form-ctl" value="{{ contest.team_size_max|default:5 }}" min="1"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:1.25rem;">
+        <div class="panel-header"><h2>Dates</h2></div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-lbl">Start Date *</label><input id="start_date" type="datetime-local" name="start_date" class="form-ctl" value="{% if contest.start_date %}{{ contest.start_date|date:'Y-m-d' }}T{{ contest.start_date|date:'H:i' }}{% endif %}" required></div>
+            <div class="form-group"><label class="form-lbl">End Date *</label><input id="end_date" type="datetime-local" name="end_date" class="form-ctl" value="{% if contest.end_date %}{{ contest.end_date|date:'Y-m-d' }}T{{ contest.end_date|date:'H:i' }}{% endif %}" required><div id="end_date_error" class="field-error" aria-live="polite"></div></div>
+            <div class="form-group"><label class="form-lbl">Reg. Deadline *</label><input id="registration_deadline" type="datetime-local" name="registration_deadline" class="form-ctl" value="{% if contest.registration_deadline %}{{ contest.registration_deadline|date:'Y-m-d' }}T{{ contest.registration_deadline|date:'H:i' }}{% endif %}" required><div id="registration_deadline_error" class="field-error" aria-live="polite"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:1.25rem;">
+        <div class="panel-header"><h2>Eligibility</h2></div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div>
+              <label class="form-lbl" style="margin-bottom:0.5rem;">Eligible Branches</label>
+              <div style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+                {% for b in branches %}
+                <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;cursor:pointer;">
+                  <input type="checkbox" name="eligible_branches" value="{{ b }}" {% if not contest or b in contest.eligible_branches %}checked{% endif %} style="accent-color:#2563eb;">{{ b }}
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div>
+              <label class="form-lbl" style="margin-bottom:0.5rem;">Eligible Years</label>
+              <div style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+                {% for y in years %}
+                <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;cursor:pointer;">
+                  <input type="checkbox" name="eligible_years" value="{{ y }}" {% if not contest or y in contest.eligible_years %}checked{% endif %} style="accent-color:#2563eb;">Year {{ y }}
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:1rem;">
+            <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;cursor:pointer;">
+              <input type="checkbox" name="allow_mixed_branches" {% if not contest or contest.allow_mixed_branches %}checked{% endif %} style="accent-color:#2563eb;">
+              Allow Mixed Branch Teams
+            </label>
+          </div>
+          <div style="margin-top:1rem;">
+            <label class="form-lbl" style="margin-bottom:0.5rem;">Organizing Branches</label>
+            <div style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+              {% for code, name in organizing_branch_choices %}
+              <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;cursor:pointer;">
+                <input type="checkbox" name="organizing_branches" value="{{ code }}" {% if contest and contest.organizing_branches and code in contest.organizing_branches %}checked{% endif %} style="accent-color:#2563eb;">{{ name }}
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:1.25rem;">
+        <div class="panel-header"><h2>Organizers</h2></div>
+        <div class="panel-body">
+          <label class="form-lbl">Select Organizers</label>
+          <div class="organizer-search-wrap">
+            <input type="text" id="organizer-search" class="form-ctl" placeholder="Type registration number or username..." autocomplete="off">
+            <div id="organizer-suggestions" class="organizer-suggestions"></div>
+          </div>
+          <div id="selected-organizers" class="organizer-tags"></div>
+          <input type="hidden" name="organizers" id="organizers-hidden" value="">
+          <div class="organizer-empty" id="organizer-empty-msg">No organizers selected yet.</div>
+          <div style="font-size:0.75rem;color:#6b7280;margin-top:0.45rem;">Search by registration number or username and press Enter to add. Only students are available.</div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:1.5rem;">
+        <div class="panel-header"><h2>Media &amp; Settings</h2></div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:end;">
+            <div class="form-group">
+              <label class="form-lbl">Banner Image</label>
+              {% if contest.banner %}<div style="font-size:0.78rem;color:#6b7280;margin-bottom:0.4rem;">Current: {{ contest.banner.name }}</div>{% endif %}
+              <input type="file" name="banner" class="form-ctl" accept="image/*">
+            </div>
+            <div style="padding-bottom:1.1rem;">
+              <div class="form-check form-switch mt-2" style="margin-bottom:0.75rem;">
+                <input class="form-check-input" type="checkbox" name="is_registration_enabled" id="id_is_registration_enabled" {% if contest and contest.is_registration_enabled %}checked{% endif %} style="accent-color:#2563eb;">
+                <label class="form-check-label" for="id_is_registration_enabled">Enable Spot Registration</label>
+              </div>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;cursor:pointer;">
+                <input type="checkbox" name="is_featured" {% if contest.is_featured %}checked{% endif %} style="accent-color:#2563eb;">
+                Mark as Featured
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <button type="submit" class="btn-p" style="padding:0.75rem 2rem;">{{ action }} Contest</button>
+        <a href="{% url 'admin_panel:contests' %}" class="btn-g" style="padding:0.75rem 1.5rem;">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  (function () {
+    var typeSelect = document.getElementById('participation_type');
+    var minGroup = document.getElementById('team_size_min_group');
+    var maxGroup = document.getElementById('team_size_max_group');
+    var minInput = document.getElementById('team_size_min');
+    var maxInput = document.getElementById('team_size_max');
+
+    function toggleTeamSizeFields() {
+      var isTeam = typeSelect && typeSelect.value === 'team';
+      if (minGroup) {
+        minGroup.style.display = isTeam ? 'block' : 'none';
+      }
+      if (maxGroup) {
+        maxGroup.style.display = isTeam ? 'block' : 'none';
+      }
+      if (minInput) {
+        minInput.required = isTeam;
+      }
+      if (maxInput) {
+        maxInput.required = isTeam;
+      }
+    }
+
+    if (typeSelect) {
+      typeSelect.addEventListener('change', toggleTeamSizeFields);
+      toggleTeamSizeFields();
+    }
+
+    var contestForm = document.querySelector('form[method="post"]');
+    var startDateInput = document.getElementById('start_date');
+    var endDateInput = document.getElementById('end_date');
+    var regDeadlineInput = document.getElementById('registration_deadline');
+    var endDateError = document.getElementById('end_date_error');
+    var regDeadlineError = document.getElementById('registration_deadline_error');
+
+    function clearDateValidation() {
+      if (endDateError) endDateError.textContent = '';
+      if (regDeadlineError) regDeadlineError.textContent = '';
+      if (endDateInput) {
+        endDateInput.classList.remove('input-error');
+        endDateInput.setCustomValidity('');
+      }
+      if (regDeadlineInput) {
+        regDeadlineInput.classList.remove('input-error');
+        regDeadlineInput.setCustomValidity('');
+      }
+    }
+
+    function validateDateOrder() {
+      clearDateValidation();
+
+      if (!startDateInput || !endDateInput || !regDeadlineInput) {
+        return true;
+      }
+
+      if (!startDateInput.value || !endDateInput.value || !regDeadlineInput.value) {
+        return true;
+      }
+
+      var start = new Date(startDateInput.value);
+      var end = new Date(endDateInput.value);
+      var deadline = new Date(regDeadlineInput.value);
+      var isValid = true;
+
+      if (end <= start) {
+        isValid = false;
+        endDateInput.classList.add('input-error');
+        endDateInput.setCustomValidity('End date must be greater than start date.');
+        if (endDateError) {
+          endDateError.textContent = 'End date must be greater than start date.';
+        }
+      }
+
+      if (deadline > start) {
+        isValid = false;
+        regDeadlineInput.classList.add('input-error');
+        regDeadlineInput.setCustomValidity('Registration deadline must be less than or equal to start date.');
+        if (regDeadlineError) {
+          regDeadlineError.textContent = 'Registration deadline must be less than or equal to start date.';
+        }
+      }
+
+      return isValid;
+    }
+
+    if (startDateInput && endDateInput && regDeadlineInput) {
+      startDateInput.addEventListener('change', validateDateOrder);
+      endDateInput.addEventListener('change', validateDateOrder);
+      regDeadlineInput.addEventListener('change', validateDateOrder);
+    }
+
+    if (contestForm) {
+      contestForm.addEventListener('submit', function (e) {
+        if (!validateDateOrder()) {
+          e.preventDefault();
+        }
+      });
+    }
+
+    var searchInput = document.getElementById('organizer-search');
+    var suggestionsEl = document.getElementById('organizer-suggestions');
+    var selectedEl = document.getElementById('selected-organizers');
+    var hiddenInput = document.getElementById('organizers-hidden');
+    var emptyMsg = document.getElementById('organizer-empty-msg');
+
+    if (!searchInput || !suggestionsEl || !selectedEl || !hiddenInput) {
+      return;
+    }
+
+    var users = [
+      {% for org_user in organizer_users %}
+      {
+        id: {{ org_user.id }},
+        username: "{{ org_user.username|escapejs }}",
+        fullName: "{{ org_user.get_full_name|escapejs }}"
+      }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    var userById = {};
+    users.forEach(function (u) { userById[u.id] = u; });
+
+    var selectedIds = new Set([
+      {% if contest %}{% for organizer in contest.organizers.all %}{{ organizer.id }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+    ]);
+    var filtered = [];
+    var activeIndex = -1;
+    var debounceTimer = null;
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getLabel(user) {
+      if (user.fullName) {
+        return user.fullName + ' (@' + user.username + ')';
+      }
+      return '@' + user.username;
+    }
+
+    function highlightMatch(text, query) {
+      if (!query) {
+        return escapeHtml(text);
+      }
+      var safe = escapeHtml(text);
+      var q = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return safe.replace(new RegExp('(' + q + ')', 'ig'), '<mark>$1</mark>');
+    }
+
+    function updateHiddenInput() {
+      hiddenInput.value = Array.from(selectedIds).join(',');
+    }
+
+    function renderTags() {
+      selectedEl.innerHTML = '';
+
+      Array.from(selectedIds).forEach(function (id) {
+        var user = userById[id];
+        if (!user) {
+          return;
+        }
+
+        var chip = document.createElement('div');
+        chip.className = 'organizer-chip';
+        chip.innerHTML = '<span>' + escapeHtml(getLabel(user)) + '</span>';
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.innerHTML = '&times;';
+        btn.setAttribute('aria-label', 'Remove organizer');
+        btn.addEventListener('click', function () {
+          selectedIds.delete(id);
+          renderTags();
+          runSearch(searchInput.value.trim());
+          searchInput.focus();
+        });
+
+        chip.appendChild(btn);
+        selectedEl.appendChild(chip);
+      });
+
+      emptyMsg.style.display = selectedIds.size ? 'none' : 'block';
+      updateHiddenInput();
+    }
+
+    function closeSuggestions() {
+      suggestionsEl.classList.remove('open');
+      suggestionsEl.innerHTML = '';
+      filtered = [];
+      activeIndex = -1;
+    }
+
+    function selectUser(user) {
+      if (!user || selectedIds.has(user.id)) {
+        return;
+      }
+      selectedIds.add(user.id);
+      searchInput.value = '';
+      closeSuggestions();
+      renderTags();
+    }
+
+    function renderSuggestions(query) {
+      if (!filtered.length) {
+        closeSuggestions();
+        return;
+      }
+
+      suggestionsEl.innerHTML = '';
+
+      filtered.forEach(function (user, index) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'organizer-item' + (index === activeIndex ? ' active' : '');
+        item.innerHTML = '<span>' + highlightMatch(getLabel(user), query) + '</span>';
+        item.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          selectUser(user);
+        });
+        suggestionsEl.appendChild(item);
+      });
+
+      suggestionsEl.classList.add('open');
+    }
+
+    function runSearch(term) {
+      var query = term.toLowerCase();
+      filtered = users.filter(function (user) {
+        if (selectedIds.has(user.id)) {
+          return false;
+        }
+        if (!query) {
+          return true;
+        }
+        return user.username.toLowerCase().indexOf(query) !== -1 ||
+               (user.fullName && user.fullName.toLowerCase().indexOf(query) !== -1);
+      }).slice(0, 8);
+
+      activeIndex = filtered.length ? 0 : -1;
+      renderSuggestions(term);
+    }
+
+    searchInput.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      var term = this.value.trim();
+      debounceTimer = setTimeout(function () {
+        runSearch(term);
+      }, 300);
+    });
+
+    searchInput.addEventListener('focus', function () {
+      runSearch(this.value.trim());
+    });
+
+    searchInput.addEventListener('keydown', function (e) {
+      if (!filtered.length) {
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIndex = (activeIndex + 1) % filtered.length;
+        renderSuggestions(searchInput.value.trim());
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIndex = (activeIndex - 1 + filtered.length) % filtered.length;
+        renderSuggestions(searchInput.value.trim());
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        var selectedUser = filtered[activeIndex] || filtered[0];
+        selectUser(selectedUser);
+      } else if (e.key === 'Escape') {
+        closeSuggestions();
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.organizer-search-wrap')) {
+        closeSuggestions();
+      }
+    });
+
+    renderTags();
+  })();
+</script>
+{% endblock %}

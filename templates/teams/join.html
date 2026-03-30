@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Join Team{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:3rem;padding-bottom:3rem;">
+  <div style="max-width:420px;margin:0 auto;">
+    <div class="panel">
+      <div class="panel-header"><h2>Join a Team</h2></div>
+      <div class="panel-body">
+        <p style="font-size:0.85rem;color:#6b7280;margin-bottom:1.25rem;">Enter the 8-character team code shared by your team leader.</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-lbl">Team Code</label>
+            <input type="text" name="code" class="form-ctl" placeholder="e.g. A1B2C3D4" maxlength="10" required autofocus style="text-transform:uppercase;letter-spacing:0.15em;font-family:monospace;font-size:1.1rem;text-align:center;">
+          </div>
+          <button type="submit" class="btn-p" style="width:100%;justify-content:center;display:flex;">Join Team</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,444 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$jKs9QOUzgAy95Mwg042JnZ$2aeBBcIcoNnIrP1AN40A5f34qUiho7NafNjQZzOLwa8=",
+    "last_login": "2026-03-15T14:57:39.927Z",
+    "is_superuser": true,
+    "username": "Admin",
+    "first_name": "Admin",
+    "last_name": "1",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-05T17:34:13.323Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$DOSVBacDYb7Gma0jM9to0t$eVldHZnQ/PbuydFNJtKuoFqVSZdrzQviw0wP0s5a+aM=",
+    "last_login": "2026-03-15T16:43:16.313Z",
+    "is_superuser": false,
+    "username": "y23cd156",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-06T17:17:20.810Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Ct4Wpowx4BedC5iU7xEYTb$xOP8eaaPrnicUOTQPYUaOhi7CxgLDuvveHdllDZhzpM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "y23cd153",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-13T18:09:47.629Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$kLTCcff2ixFUPrdKJVhh8Y$Y7QTlKUjSVq4/oLHQwZmTI5TWt5vEi84r0vOrHiBRbI=",
+    "last_login": "2026-03-14T08:15:11.450Z",
+    "is_superuser": false,
+    "username": "y23cd161",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-13T18:09:49.417Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$En94rulDqGaq3CTYGUExNM$fVNmUZDb0dWjvVDQqayDzRmJzy02dycLdG2f+4b4+Qg=",
+    "last_login": "2026-03-15T14:47:26.429Z",
+    "is_superuser": false,
+    "username": "y23cd155",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-13T18:09:51.174Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$QKJjsi6qA9pcuNo7fCITyb$zm2TpBFJAeTBNkN9Do++2w0cpjzkXHOe458Xy9fJr4I=",
+    "last_login": "2026-03-15T14:47:44.797Z",
+    "is_superuser": false,
+    "username": "y23cd151",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-13T18:09:52.858Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$RXLNsYDzBm8RtxjJVmfAGX$0ieB+oXSP4+KJjx1OUp/F4TkwG/V0vXhoC6CagbchXY=",
+    "last_login": "2026-03-13T18:37:41.222Z",
+    "is_superuser": false,
+    "username": "sampleadmin",
+    "first_name": "Sample",
+    "last_name": "Admin",
+    "email": "adminsample@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-03-13T18:19:15.562Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Nka26YQSBZ8HhQ8BXqYvZH$7a08tirwXIXMj9j84K63+aavQ6W+spK94W/9yJnHX7U=",
+    "last_login": "2026-03-15T14:26:09.696Z",
+    "is_superuser": false,
+    "username": "y23cm176",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-03-14T09:30:16.220Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "izax99p9r1elh5xiz4edff74168bjmdb",
+  "fields": {
+    "session_data": "e30:1w16zP:ci_S771oaYccRc1xZFn759qxus4dx3ya1wRjrU7EU4U",
+    "expire_date": "2026-03-27T18:11:59.845Z"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "profile_picture": "",
+    "branch": "",
+    "year": null,
+    "phone": "",
+    "department": "CSD",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "profile_picture": "",
+    "branch": "CSD",
+    "year": 3,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 3,
+  "fields": {
+    "user": 3,
+    "profile_picture": "",
+    "branch": "CSD",
+    "year": 3,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 4,
+  "fields": {
+    "user": 4,
+    "profile_picture": "",
+    "branch": "CSD",
+    "year": 3,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 5,
+  "fields": {
+    "user": 5,
+    "profile_picture": "",
+    "branch": "CSD",
+    "year": 3,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 6,
+  "fields": {
+    "user": 6,
+    "profile_picture": "",
+    "branch": "CSD",
+    "year": 3,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 7,
+  "fields": {
+    "user": 7,
+    "profile_picture": "",
+    "branch": "",
+    "year": null,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 8,
+  "fields": {
+    "user": 8,
+    "profile_picture": "",
+    "branch": "CSM",
+    "year": 3,
+    "phone": "",
+    "department": "",
+    "bio": ""
+  }
+},
+{
+  "model": "contests.contest",
+  "pk": 7,
+  "fields": {
+    "title": "C-Quence",
+    "description": "Coding Talent Hunt ",
+    "category": "Coding Contest",
+    "venue": "VDC, Decennial Block",
+    "banner": "banners/ChatGPT_Image_Feb_24_2026_10_10_13_PM_xx8Usxv.png",
+    "participation_type": "solo",
+    "team_size_min": 2,
+    "team_size_max": 5,
+    "start_date": "2026-03-15T04:30:00Z",
+    "end_date": "2026-03-15T07:30:00Z",
+    "registration_deadline": "2026-03-15T15:30:00Z",
+    "is_featured": false,
+    "eligible_branches": [
+      "CSE",
+      "CSD",
+      "CSM",
+      "CSO",
+      "CSBS",
+      "IT"
+    ],
+    "eligible_years": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "allow_mixed_branches": true,
+    "created_at": "2026-03-14T09:22:06.427Z"
+  }
+},
+{
+  "model": "contests.contest",
+  "pk": 8,
+  "fields": {
+    "title": "AI Hackathon",
+    "description": "AI Hackathon for 24 Hrs",
+    "category": "Hackathon",
+    "venue": "GRR Auditorium",
+    "banner": "banners/ChatGPT_Image_Feb_25_2026_08_20_02_AM_KQ1YIE7.png",
+    "participation_type": "team",
+    "team_size_min": 2,
+    "team_size_max": 4,
+    "start_date": "2026-03-16T08:30:00Z",
+    "end_date": "2026-03-17T08:30:00Z",
+    "registration_deadline": "2026-03-16T07:30:00Z",
+    "is_featured": false,
+    "eligible_branches": [
+      "CSE",
+      "CSD",
+      "CSM",
+      "CSO",
+      "CSBS",
+      "IT"
+    ],
+    "eligible_years": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "allow_mixed_branches": true,
+    "created_at": "2026-03-14T09:28:09.367Z"
+  }
+},
+{
+  "model": "teams.team",
+  "pk": 5,
+  "fields": {
+    "name": "Code Giants",
+    "contest": 8,
+    "leader": 6,
+    "team_code": "66DB4992",
+    "created_at": "2026-03-14T09:39:21.599Z"
+  }
+},
+{
+  "model": "teams.team",
+  "pk": 7,
+  "fields": {
+    "name": "Code Wizards",
+    "contest": 8,
+    "leader": 2,
+    "team_code": "3EEB8D91",
+    "created_at": "2026-03-15T14:22:02.885Z"
+  }
+},
+{
+  "model": "teams.teammember",
+  "pk": 11,
+  "fields": {
+    "team": 5,
+    "user": 6,
+    "joined_at": "2026-03-14T09:39:21.615Z"
+  }
+},
+{
+  "model": "teams.teammember",
+  "pk": 15,
+  "fields": {
+    "team": 7,
+    "user": 2,
+    "joined_at": "2026-03-15T14:22:02.902Z"
+  }
+},
+{
+  "model": "teams.teammember",
+  "pk": 16,
+  "fields": {
+    "team": 7,
+    "user": 8,
+    "joined_at": "2026-03-15T14:26:15.996Z"
+  }
+},
+{
+  "model": "teams.teammember",
+  "pk": 17,
+  "fields": {
+    "team": 5,
+    "user": 5,
+    "joined_at": "2026-03-15T14:47:32.554Z"
+  }
+},
+{
+  "model": "registrations.registration",
+  "pk": 6,
+  "fields": {
+    "user": 2,
+    "contest": 7,
+    "team": null,
+    "created_at": "2026-03-14T09:23:40.889Z"
+  }
+},
+{
+  "model": "registrations.registration",
+  "pk": 7,
+  "fields": {
+    "user": 8,
+    "contest": 7,
+    "team": null,
+    "created_at": "2026-03-14T09:31:17.364Z"
+  }
+},
+{
+  "model": "registrations.registration",
+  "pk": 8,
+  "fields": {
+    "user": 5,
+    "contest": 7,
+    "team": null,
+    "created_at": "2026-03-14T09:38:40.375Z"
+  }
+},
+{
+  "model": "registrations.registration",
+  "pk": 9,
+  "fields": {
+    "user": 6,
+    "contest": 7,
+    "team": null,
+    "created_at": "2026-03-14T09:39:05.719Z"
+  }
+},
+{
+  "model": "registrations.registration",
+  "pk": 14,
+  "fields": {
+    "user": 2,
+    "contest": 8,
+    "team": 7,
+    "created_at": "2026-03-15T14:31:53.049Z"
+  }
+},
+{
+  "model": "registrations.registration",
+  "pk": 15,
+  "fields": {
+    "user": 6,
+    "contest": 8,
+    "team": 5,
+    "created_at": "2026-03-15T14:57:16.007Z"
+  }
+}
+]

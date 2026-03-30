@@ -1,0 +1,26 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Confirm Delete - {{ contest.title }}{% endblock %}
+{% block content %}
+<div class="ds-container" style="padding-top:4rem;padding-bottom:5rem;max-width:600px;">
+    <div class="ds-card" style="padding:2.5rem;text-align:center;border-top:4px solid var(--danger);">
+        <div style="font-size:3.5rem;color:var(--danger);margin-bottom:1.5rem;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h1 style="font-size:1.8rem;margin-bottom:1rem;">Delete Contest?</h1>
+        <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.6;">
+            Are you sure you want to delete <strong>"{{ contest.title }}"</strong>? This action cannot be undone and
+            will delete all associated registrations and team data.
+        </p>
+
+        <form method="post" style="display:flex;gap:1rem;justify-content:center;">
+            {% csrf_token %}
+            <a href="{% url 'admin_panel:contests' %}" class="ds-btn ds-btn-ghost"
+                style="padding:0 2rem;height:48px;line-height:46px;">Cancel</a>
+            <button type="submit" class="ds-btn ds-btn-primary"
+                style="background:var(--danger);border-color:var(--danger);padding:0 2rem;height:48px;">
+                Yes, Delete Contest
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

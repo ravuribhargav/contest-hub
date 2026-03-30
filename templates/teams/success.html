@@ -1,0 +1,68 @@
+{% if request.GET.success_action == 'join_team' or request.GET.success_action == 'team_creation' %}
+<div class="ds-container" style="padding-top: 3rem; padding-bottom: 3rem;">
+    <div class="success-card-wrapper">
+        <div class="success-card shadow-lg border-0 rounded-4 overflow-hidden bg-white mx-auto" style="max-width: 500px; animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="card-body p-5 text-center">
+                <!-- SUCCESS ICON WITH PULSE ANIMATION -->
+                <div class="success-icon-bg mb-4 mx-auto d-flex align-items-center justify-content-center" 
+                     style="width: 80px; height: 80px; background: #f0fdf4; border-radius: 50%; color: #22c55e; font-size: 2.5rem; animation: scaleIn 0.5s ease-out;">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+
+                <h3 class="fw-bold text-dark mb-2" style="font-family: 'Inter', sans-serif; letter-spacing: -0.02em;">
+                    Team {% if request.GET.success_action == 'join_team' %}Joined{% else %}Created{% endif %} Successfully!
+                </h3>
+                
+                <p class="text-secondary mb-4 px-3" style="font-size: 0.95rem; line-height: 1.6;">
+                    {{ request.GET.success_msg|default:"You have been successfully added to the team." }}
+                </p>
+
+                <!-- AUTO REDIRECT INDICATOR -->
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-4 text-primary small fw-medium">
+                    <div class="spinner-border spinner-border-sm" role="status" style="width: 12px; height: 12px; border-width: 2px;"></div>
+                    <span>Redirecting to your team in 3 seconds...</span>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="d-grid gap-2">
+                    {% if request.GET.team_id %}
+                    <a href="{% url 'teams:detail' request.GET.team_id %}" class="btn btn-primary py-2 fw-bold shadow-sm">
+                        View Team Now
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'accounts:student_dashboard' %}" class="btn btn-link text-muted text-decoration-none small">
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.success-card {
+    transition: transform 0.3s ease;
+}
+.success-card:hover {
+    transform: translateY(-5px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if request.GET.team_id %}
+    setTimeout(function() {
+        window.location.href = "{% url 'teams:detail' request.GET.team_id %}";
+    }, 3000);
+    {% endif %}
+});
+</script>
+{% endif %}

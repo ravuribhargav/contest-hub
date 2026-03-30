@@ -1,0 +1,37 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Announcements{% endblock %}
+{% block content %}
+<div class="admin-ph"><div class="container"><h1>Announcements</h1><p style="margin:0;color:#6b7280;font-size:0.875rem;">Control the top announcement bar.</p></div></div>
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+    <div class="panel">
+      <div class="panel-header"><h2>New Announcement</h2></div>
+      <div class="panel-body">
+        <p style="font-size:0.8rem;color:#6b7280;margin-bottom:1rem;">Publishing will deactivate all current announcements.</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create">
+          <div class="form-group"><label class="form-lbl">Announcement Text</label><input type="text" name="text" class="form-ctl" placeholder="📢 Registrations are now open!" maxlength="300" required></div>
+          <button type="submit" class="btn-p">Publish</button>
+        </form>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><h2>All Announcements</h2></div>
+      {% for item in items %}
+      <div style="padding:0.9rem 1.25rem;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+        <div style="flex:1;">
+          <div style="font-size:0.85rem;color:#111827;">{{ item.text }}</div>
+          <div style="font-size:0.72rem;color:#6b7280;margin-top:0.2rem;">{{ item.created_at|date:"M d, Y" }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">
+          {% if item.is_active %}<span class="badge-status st-registration_open" style="margin-right:0.25rem;">Active</span>{% endif %}
+          <form method="post" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="{{ item.pk }}"><button type="submit" class="btn-g btn-sm">{% if item.is_active %}Off{% else %}On{% endif %}</button></form>
+          <form method="post" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ item.pk }}"><button type="submit" class="btn-danger btn-sm" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></button></form>
+        </div>
+      </div>
+      {% empty %}<div class="empty-state" style="padding:2rem;"><h3>No announcements yet</h3></div>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

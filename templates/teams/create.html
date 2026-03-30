@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Create Team{% endblock %}
+{% block content %}
+<div class="container" style="padding-top:3rem;padding-bottom:3rem;">
+  <div style="max-width:420px;margin:0 auto;">
+    <div class="bc"><a href="{% url 'contests:detail' contest.pk %}">{{ contest.title }}</a><span class="sep">/</span><span>Create Team</span></div>
+    <div class="panel">
+      <div class="panel-header"><h2>Create a Team</h2></div>
+      <div class="panel-body">
+        <p style="font-size:0.85rem;color:#6b7280;margin-bottom:1.25rem;">For <strong>{{ contest.title }}</strong>. Team size: {{ contest.team_size_min }}–{{ contest.team_size_max }} members.</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-lbl" for="id_name">Team Name *</label>
+            <input
+              type="text"
+              id="id_name"
+              name="name"
+              class="form-ctl{% if form.name.errors %} is-invalid{% endif %}"
+              placeholder="e.g. Code Wizards"
+              value="{{ form.name.value|default:'' }}"
+              required
+              autofocus>
+            {% for err in form.name.errors %}
+              <div style="color:#b91c1c;font-size:0.8rem;margin-top:0.45rem;">{{ err }}</div>
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn-p" style="width:100%;justify-content:center;display:flex;">Create Team</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

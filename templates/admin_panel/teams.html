@@ -1,0 +1,35 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Teams{% endblock %}
+{% block content %}
+<div class="admin-ph"><div class="container"><h1>Teams</h1><p style="margin:0;color:#6b7280;font-size:0.875rem;">All registered teams.</p></div></div>
+<div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+  <form method="get" class="filter-bar">
+    <div>
+      <label class="form-lbl" style="font-size:0.7rem;">Contest</label>
+      <select name="contest" style="min-width:200px;">
+        <option value="">All Contests</option>
+        {% for c in contests %}<option value="{{ c.pk }}" {% if contest_f == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.title }}</option>{% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-p btn-sm">Filter</button>
+    <a href="{% url 'admin_panel:teams' %}" class="btn-g btn-sm">Clear</a>
+  </form>
+  <div class="panel">
+    <table class="data-tbl">
+      <thead><tr><th style="padding-left:1.5rem;">Team</th><th>Contest</th><th>Leader</th><th>Members</th><th>Code</th><th>Created</th></tr></thead>
+      <tbody>
+        {% for t in teams %}
+        <tr>
+          <td style="padding-left:1.5rem;font-weight:600;">{{ t.name }}</td>
+          <td style="font-size:0.8rem;color:#6b7280;">{{ t.contest.title }}</td>
+          <td style="font-size:0.875rem;">{{ t.leader.get_full_name|default:t.leader.username }}</td>
+          <td><span class="tag" style="font-size:0.7rem;">{{ t.mc }}</span></td>
+          <td><code style="font-size:0.78rem;background:#f1f5f9;padding:0.2em 0.5em;border-radius:5px;color:#2563eb;">{{ t.team_code }}</code></td>
+          <td style="font-size:0.78rem;color:#6b7280;">{{ t.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}<tr><td colspan="6" style="text-align:center;padding:2rem;color:#6b7280;">No teams found.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

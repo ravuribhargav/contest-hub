@@ -1,0 +1,343 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="ds-page-hero">
+  <div class="ds-container"
+    style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h1>User Management</h1>
+      <p>View, search, filter, and deactivate registered students.</p>
+    </div>
+    <div style="display:flex;gap:0.5rem;">
+      <a href="{% url 'admin_panel:add_admin' %}" class="ds-btn ds-btn-primary"><i class="bi bi-person-plus"></i> Add Admin</a>
+      <a href="{% url 'admin_panel:users_upload' %}" class="ds-btn ds-btn-primary"><i class="bi bi-cloud-upload"></i> Bulk Upload</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.table-row:hover {
+  background:#f8fafc;
+  cursor:pointer;
+}
+thead {
+  position:sticky;
+  top:0;
+  background:white;
+  z-index:10;
+}
+.user-count {
+  background: #f8fafc;
+  color: #4b5563;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  box-shadow: none;
+  border: 1px solid #e5e7eb;
+  font-weight: 500;
+}
+/* MODAL LAYERING FIXES */
+.modal {
+  z-index: 1055 !important;
+}
+.modal-backdrop {
+  z-index: 1050 !important;
+  background-color: transparent !important;
+  opacity: 0 !important;
+}
+.modal-dialog {
+  pointer-events: auto !important;
+}
+</style>
+
+<div class="ds-container" style="padding-top:2rem;padding-bottom:3rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <h5 class="mb-0" style="margin:0;font-size:1rem;">User Management</h5>
+    <span class="user-count">{{ count_label }}</span>
+  </div>
+
+  <!-- FILTER BAR -->
+  <form method="GET" class="ds-filter-bar">
+    <div style="flex:1;min-width:200px;">
+      <label class="ds-form-label" style="font-size:0.7rem;">Search</label>
+      <input type="text" name="q" value="{{ search }}" placeholder="Username or name..." class="ds-search-inp"
+        style="padding:0.5rem 0.85rem;font-size:0.82rem;">
+    </div>
+    <div>
+      <label class="ds-form-label" style="font-size:0.7rem;">Role</label>
+      <select name="role" onchange="this.form.submit()">
+        <option value="">All Users</option>
+        <option value="students" {% if role_f == 'students' %}selected{% endif %}>Students</option>
+        <option value="admins" {% if role_f == 'admins' %}selected{% endif %}>Admins</option>
+      </select>
+    </div>
+    <div>
+      <label class="ds-form-label" style="font-size:0.7rem;">Branch</label>
+      <select name="branch">
+        <option value="">All Branches</option>
+        {% for b in branches %}<option value="{{ b }}" {% if branch_f == b %}selected{% endif %}>{{ b }}</option>{% endfor   %}
+      </select>
+    </div>
+    <div>
+      <label class="ds-form-label" style="font-size:0.7rem;">Year</label>
+      <select name="year" onchange="this.form.submit()">
+        <option value="">All Years</option>
+        {% for y in years %}<option value="{{ y }}" {% if year_f == y|stringformat:"s" %}selected{% endif %}>Year {{ y }}
+        </option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="ds-form-label" style="font-size:0.7rem;">Section</label>
+      <select name="section" onchange="this.form.submit()">
+        <option value="">All Sections</option>
+        {% for s in "ABCDEF"|make_list %}<option value="{{ s }}" {% if section_f == s %}selected{% endif %}>Section {{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="display:flex;gap:0.5rem;align-items:flex-end;">
+      <button type="submit" class="ds-btn ds-btn-primary ds-btn-sm">Filter</button>
+      <a href="{% url 'admin_panel:users' %}" class="ds-btn ds-btn-ghost ds-btn-sm">Clear</a>
+    </div>
+  </form>
+
+  <div class="ds-card">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th style="padding-left:1.5rem;">Username</th>
+          <th>Role</th>
+          <th>Branch</th>
+          <th>Year</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr class="table-row">
+          <td style="padding-left:1.5rem;">
+            {% if not u.is_staff %}
+            <a href="{% url 'admin_panel:student_profile' u.id %}" style="text-decoration:none; color:inherit; display:block;">
+              <div style="display:flex;align-items:center;gap:0.65rem;">
+                <div class="ds-avatar" style="width:32px;height:32px;font-size:0.65rem; overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;">
+                  {% if u.profile.profile_picture %}
+                    <img src="{{ u.profile.profile_picture.url }}" class="profile-img" style="width:100%;height:100%;object-fit:cover;">
+                  {% else %}
+                    {{ u.first_name|default:u.username|slice:":1"|upper }}{{ u.last_name|default:""|slice:":1"|upper }}
+                  {% endif %}
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:0.875rem;transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='inherit'">{{ u.username|upper }}</div>
+                  <div style="font-size:0.72rem;color:var(--text-muted);">{{ u.get_full_name|default:"—" }}</div>
+                </div>
+              </div>
+            </a>
+            {% else %}
+            <div style="display:flex;align-items:center;gap:0.65rem;">
+              <div class="ds-avatar" style="width:32px;height:32px;font-size:0.65rem; overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;">
+                {% if u.profile.profile_picture %}
+                  <img src="{{ u.profile.profile_picture.url }}" class="profile-img" style="width:100%;height:100%;object-fit:cover;">
+                {% else %}
+                  {{ u.first_name|default:u.username|slice:":1"|upper }}{{ u.last_name|default:""|slice:":1"|upper }}
+                {% endif %}
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:0.875rem;">{{ u.username|upper }}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">{{ u.get_full_name|default:"—" }}</div>
+              </div>
+            </div>
+            {% endif %}
+          </td>
+          <td>
+            {% if u.is_staff %}
+            <span class="ds-badge" style="background:#ede9fe; color:#5b21b6;">Admin</span>
+            {% else %}
+            <span class="ds-badge" style="background:#dbeafe; color:#1e40af;">Student</span>
+            {% endif %}
+          </td>
+          <td>{% if u.is_staff %}—{% elif u.profile.branch %}<span class="ds-tag">{{ u.profile.branch }}</span>{% else %}—{% endif %}</td>
+          <td style="font-size:0.82rem;">{% if u.is_staff %}—{% elif u.profile.year %}Year {{ u.profile.year }}{% else %}—{% endif %}</td>
+          <td>{% if u.is_active %}<span class="ds-badge ds-badge-green">Active</span>{% else %}<span
+              class="ds-badge ds-badge-gray">Inactive</span>{% endif %}</td>
+          <td>
+            <div style="display:flex;gap:0.4rem;align-items:center;">
+              <!-- Reset Password -->
+              <button type="button" class="ds-btn ds-btn-ghost ds-btn-sm" style="padding:0.35rem 0.6rem;font-size:0.95rem;color:var(--primary);" 
+                      data-id="{{ u.id }}" data-username="{{ u.username }}" onclick="openResetModal(this)" title="Reset Password">
+                <i class="bi bi-key"></i>
+              </button>
+
+              <!-- Delete User -->
+              <button type="button" class="ds-btn ds-btn-ghost ds-btn-sm" style="padding:0.35rem 0.6rem;font-size:0.95rem;color:var(--danger);" 
+                      data-id="{{ u.id }}" data-username="{{ u.username }}" onclick="openDeleteModal(this)" title="Delete User"
+                      {% if request.user == u or u.is_staff %}disabled{% endif %}>
+                <i class="bi bi-trash"></i>
+              </button>
+
+              <!-- Toggle Status -->
+              <button type="button" class="ds-btn ds-btn-sm {% if u.is_active %}ds-btn-warning{% else %}ds-btn-success{% endif %}" 
+                      style="padding:0.35rem 0.6rem;font-size:0.85rem;min-width:36px;display:flex;align-items:center;justify-content:center;" 
+                      data-id="{{ u.id }}" data-username="{{ u.username }}" data-active="{{ u.is_active|yesno:'true,false' }}"
+                      onclick="openToggleModal(this)"
+                      {% if request.user == u %}disabled{% endif %}
+                      title="{% if u.is_active %}Deactivate{% else %}Activate{% endif %}">
+                {% if u.is_active %}<i class="bi bi-person-x"></i>{% else %}<i class="bi bi-person-check"></i>{% endif %}
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">
+            <div class="ds-empty">
+              <div class="ds-empty-ico"><i class="bi bi-people"></i></div>
+              <h3>No users found</h3>
+              <p>Try adjusting the filters above.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if users.has_other_pages %}
+  <div class="ds-pg">
+    {% if users.has_previous %}<a
+      href="?page={{ users.previous_page_number }}&q={{ search }}&branch={{ branch_f }}&year={{ year_f }}&role={{ role_f }}"
+      class="ds-pg-btn">‹</a>{% endif %}
+    {% for n in users.paginator.page_range %}<a
+      href="?page={{ n }}&q={{ search }}&branch={{ branch_f }}&year={{ year_f }}&role={{ role_f }}"
+      class="ds-pg-btn {% if n == users.number %}active{% endif %}">{{ n }}</a>{% endfor %}
+    {% if users.has_next %}<a
+      href="?page={{ users.next_page_number }}&q={{ search }}&branch={{ branch_f }}&year={{ year_f }}&role={{ role_f }}"
+      class="ds-pg-btn">›</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<!-- SHARED MODALS -->
+<div id="reusable-modals-container">
+  <!-- Reset Password Modal -->
+  <div class="modal fade" id="resetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none; border-radius:12px; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div class="modal-header border-0 pb-0" style="padding:1.5rem 1.5rem 0.5rem;">
+          <h5 class="modal-title" style="font-weight:700;color:var(--primary);">Reset Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="padding:1.5rem;">
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.5rem;">Set a new password for <strong id="resetUsernameDisplay"></strong></p>
+          <form method="post" action="{% url 'admin_panel:reset_student_password' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="resetUserId">
+            <div class="ds-form-group">
+              <label class="ds-form-label">New Password</label>
+              <input type="password" name="new_password" class="ds-form-control" required placeholder="••••••••">
+            </div>
+            <div class="ds-form-group" style="margin-bottom:1.5rem;">
+              <label class="ds-form-label">Confirm Password</label>
+              <input type="password" name="confirm_password" class="ds-form-control" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="ds-btn ds-btn-primary w-100 justify-content-center">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toggle Status Modal -->
+  <div class="modal fade" id="toggleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none; border-radius:12px; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div class="modal-header border-0 pb-0" style="padding:1.5rem 1.5rem 0.5rem;">
+          <h5 class="modal-title" style="font-weight:700;" id="toggleModalTitle">Toggle Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="padding:1.5rem;">
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.5rem;" id="toggleModalBody"></p>
+          <form method="post" action="{% url 'admin_panel:toggle_user' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="toggleUserId">
+            <div style="display:flex;justify-content:flex-end;gap:0.75rem;">
+              <button type="button" class="ds-btn ds-btn-ghost" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="ds-btn" id="toggleModalSubmit">Confirm</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete User Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border:none; border-radius:12px; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div class="modal-header border-0 pb-0" style="padding:1.5rem 1.5rem 0.5rem;">
+          <h5 class="modal-title" style="font-weight:700;color:var(--danger);">Permanent Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="padding:1.5rem;">
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1rem;">Are you sure you want to permanently delete <strong id="deleteUsernameDisplay"></strong>?</p>
+          <div class="ds-alert ds-alert-error mb-4" style="font-size:0.75rem;padding:0.75rem;">
+            <i class="bi bi-exclamation-triangle-fill"></i> This action is <b>irreversible</b>. All associated data will be lost.
+          </div>
+          <form method="post" action="{% url 'admin_panel:delete_user' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="deleteUserId">
+            <div style="display:flex;justify-content:flex-end;gap:0.75rem;">
+              <button type="button" class="ds-btn ds-btn-ghost" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="ds-btn ds-btn-danger">Delete Permanently</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openResetModal(btn) {
+    const id = btn.dataset.id;
+    const username = btn.dataset.username;
+    document.getElementById('resetUserId').value = id;
+    document.getElementById('resetUsernameDisplay').innerText = '@' + username;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('resetModal')).show();
+}
+
+function openToggleModal(btn) {
+    const id = btn.dataset.id;
+    const username = btn.dataset.username;
+    const isActive = btn.dataset.active === 'true';
+    
+    document.getElementById('toggleUserId').value = id;
+    const title = document.getElementById('toggleModalTitle');
+    const body = document.getElementById('toggleModalBody');
+    const submit = document.getElementById('toggleModalSubmit');
+    
+    if (isActive) {
+        title.innerText = 'Deactivate Account';
+        title.style.color = 'var(--warning)';
+        body.innerHTML = `Are you sure? User <strong>@${username}</strong> will <b>not</b> be able to login until activated again.`;
+        submit.className = 'ds-btn ds-btn-warning';
+        submit.innerText = 'Deactivate Account';
+    } else {
+        title.innerText = 'Activate Account';
+        title.style.color = 'var(--success)';
+        body.innerHTML = `Restore login access for <strong>@${username}</strong>?`;
+        submit.className = 'ds-btn ds-btn-success';
+        submit.innerText = 'Activate Account';
+    }
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('toggleModal')).show();
+}
+
+function openDeleteModal(btn) {
+    const id = btn.dataset.id;
+    const username = btn.dataset.username;
+    document.getElementById('deleteUserId').value = id;
+    document.getElementById('deleteUsernameDisplay').innerText = '@' + username;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

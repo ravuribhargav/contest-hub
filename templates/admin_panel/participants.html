@@ -1,0 +1,241 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}{{ contest.title }} - Contest Details{% endblock %}
+{% block content %}
+<div class="ds-container" style="padding-top:2rem;padding-bottom:3rem;">
+  <!-- Breadcrumb -->
+  <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+    <a href="{% url 'admin_panel:contests' %}" style="color:var(--primary);text-decoration:none;">Contests</a> / <span style="color:var(--dark);">{{ contest.title }}</span>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h1 style="font-size:1.8rem;margin:0;color:var(--dark);letter-spacing:-0.03em;">{{ contest.title }}</h1>
+      <p style="margin:0.2rem 0 0;color:var(--text-secondary);">Contest Details & Participants</p>
+    </div>
+    <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+      {% if regs is not None or teams is not None %}
+      <a href="?export=1{% if branch_f %}&branch={{ branch_f }}{% endif %}{% if year_f %}&year={{ year_f }}{% endif %}" class="ds-btn ds-btn-primary ds-btn-sm" style="background:var(--success);border:none;">
+        <i class="bi bi-download"></i> Export CSV
+      </a>
+      {% endif %}
+      <a href="{% url 'admin_panel:contest_edit' contest.pk %}" class="ds-btn ds-btn-primary ds-btn-sm">
+        <i class="bi bi-pencil-square"></i> Edit Contest
+      </a>
+      <button type="button" class="ds-btn ds-btn-danger ds-btn-sm" data-bs-toggle="modal" data-bs-target="#deleteContestModal">
+        <i class="bi bi-trash"></i> Delete Contest
+      </button>
+    </div>
+  </div>
+  
+  <!-- Contest Banner -->
+  <div class="ds-banner-wrapper mb-4 position-relative overflow-hidden shadow-sm rounded-4" style="background: #000; border:1px solid var(--border-light); max-height: 400px; display: flex; align-items: center; justify-content: center;">
+    {% if contest.banner %}
+      <img src="{{ contest.banner.url }}" alt="{{ contest.title }}" style="width:100%; height:auto; max-height:400px; object-fit:contain;">
+      <!-- Optional: Subtle gradient only on edges to blend with background -->
+      <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.2) 100%); pointer-events: none;"></div>
+    {% else %}
+      <div style="width:100%; height:200px; background:var(--bg-muted); display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
+        <div class="text-center">
+          <i class="bi bi-image" style="font-size:2rem; opacity:0.3;"></i>
+          <p class="mb-0 small fw-semibold" style="margin-top:0.5rem;">No Banner Available</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Contest Information Card -->
+  <div class="ds-card" style="margin-bottom:2.5rem;box-shadow:var(--shadow-sm);">
+    <div class="ds-card-header">
+      <h2 style="font-size:1.1rem;"><i class="bi bi-info-circle" style="color:var(--primary);margin-right:0.5rem;"></i>Contest Information</h2>
+    </div>
+    <div class="ds-card-body" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:2rem;">
+      <div style="border-right:1px solid var(--border-light);padding-right:1rem;">
+        <h3 style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;font-weight:700;">Description</h3>
+        <p style="font-size:0.95rem;color:var(--text);white-space:pre-line;">{{ contest.description }}</p>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:0.2rem;text-transform:uppercase;">Venue</div>
+            <div style="font-weight:600;color:var(--dark);">{{ contest.venue }}</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:0.2rem;text-transform:uppercase;">Participation Type</div>
+            <div style="font-weight:600;"><span class="ds-badge ds-badge-indigo">{{ contest.get_participation_type_display }}</span></div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:0.2rem;text-transform:uppercase;">Start Date</div>
+            <div style="font-weight:600;font-size:0.85rem;color:var(--dark);">{{ contest.start_date|date:"M d, Y · h:i A" }}</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:0.2rem;text-transform:uppercase;">End Date</div>
+            <div style="font-weight:600;font-size:0.85rem;color:var(--dark);">{{ contest.end_date|date:"M d, Y · h:i A" }}</div>
+          </div>
+          <div>
+             <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:0.2rem;text-transform:uppercase;">Reg. Deadline</div>
+             <div style="font-weight:600;font-size:0.85rem;color:var(--danger);">{{ contest.registration_deadline|date:"M d, Y · h:i A" }}</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;margin-bottom:0.2rem;text-transform:uppercase;">Statistics</div>
+            <div style="font-weight:600;font-size:0.85rem;display:flex;gap:1.25rem;">
+              <span style="display:flex;align-items:center;gap:0.3rem;"><i class="bi bi-people" style="color:var(--primary);"></i> {{ participant_count }} Participants</span>
+              {% if contest.participation_type != 'solo' %}
+                <span style="display:flex;align-items:center;gap:0.3rem;"><i class="bi bi-diagram-3" style="color:var(--success);"></i> {{ team_count }} Teams</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants Section -->
+  <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <h2 style="font-size:1.3rem;margin:0;color:var(--dark);font-weight:700;">
+      <i class="bi {% if contest.participation_type == 'solo' %}bi-person-lines-fill{% else %}bi-diagram-3{% endif %}" style="margin-right:0.5rem;color:var(--text-muted);"></i>
+      {% if contest.participation_type == 'solo' %}Participants{% else %}Registered Teams{% endif %}
+    </h2>
+    
+    {% if contest.participation_type == 'solo' %}
+    <form method="get" style="display:flex;gap:0.75rem;align-items:center;">
+      <select name="branch" class="ds-form-control" style="padding:0.4rem 0.7rem;font-size:0.82rem;border-radius:6px;width:auto;border:1px solid var(--border);">
+        <option value="">All Branches</option>
+        {% for b in branches %}<option value="{{ b }}" {% if branch_f == b %}selected{% endif %}>{{ b }}</option>{% endfor %}
+      </select>
+      <select name="year" class="ds-form-control" style="padding:0.4rem 0.7rem;font-size:0.82rem;border-radius:6px;width:auto;border:1px solid var(--border);">
+        <option value="">All Years</option>
+        {% for y in years %}<option value="{{ y }}" {% if year_f == y|stringformat:"s" %}selected{% endif %}>Year {{ y }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="ds-btn ds-btn-primary ds-btn-sm" style="padding:0.4rem 0.8rem;">Filter</button>
+      <a href="{% url 'admin_panel:participants' contest.pk %}" class="ds-btn ds-btn-ghost ds-btn-sm" style="padding:0.4rem 0.8rem;">Clear</a>
+    </form>
+    {% endif %}
+  </div>
+
+  {% if contest.participation_type == 'solo' %}
+    <div class="ds-card" style="box-shadow:var(--shadow-sm);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="ds-table" style="width:100%;text-align:left;border-collapse:collapse;">
+        <thead style="background:var(--bg-light);border-bottom:1px solid var(--border);">
+          <tr>
+            <th style="padding:1rem 1.5rem;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Username</th>
+            <th style="padding:1rem;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Full Name</th>
+            <th style="padding:1rem;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Branch</th>
+            <th style="padding:1rem;font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Year</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in regs %}
+          <tr style="border-bottom:1px solid var(--border-light);transition:all 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+            <td style="padding:1rem 1.5rem;font-weight:600;color:var(--dark);font-size:0.9rem;">{{ r.user.username|upper }}</td>
+            <td style="padding:1rem;color:var(--text-secondary);font-size:0.9rem;">{{ r.user.get_full_name|default:"-" }}</td>
+            <td style="padding:1rem;">{% if r.user.profile.branch %}<span class="ds-badge ds-badge-gray">{{ r.user.profile.branch }}</span>{% else %}—{% endif %}</td>
+            <td style="padding:1rem;font-size:0.9rem;">{% if r.user.profile.year %}Year {{ r.user.profile.year }}{% else %}—{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4"><div class="ds-empty" style="padding:4rem 0;text-align:center;"><i class="bi bi-people" style="font-size:2.5rem;color:var(--border);"></i><p style="margin-top:1rem;color:var(--text-muted);">No registrations yet.</p></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="display:flex;flex-direction:column;gap:1.25rem;">
+      {% for team in teams %}
+      <details class="ds-card team-card-expandable" style="box-shadow:var(--shadow-sm);transition:transform 0.2s, box-shadow 0.2s;overflow:hidden;border:1px solid var(--border);border-radius:12px;">
+        <summary style="padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;list-style:none;background:white;outline:none;">
+          <div>
+            <h3 style="margin:0;font-size:1.1rem;color:var(--dark);display:flex;align-items:center;gap:0.75rem;font-weight:700;">
+              {{ team.name }}
+              <code style="font-size:0.72rem;padding:0.25em 0.6em;background:var(--bg-muted);color:var(--primary);border-radius:6px;font-weight:600;letter-spacing:0.04em;">{{ team.team_code }}</code>
+            </h3>
+            <div style="display:flex;gap:1.5rem;margin-top:0.4rem;font-size:0.85rem;color:var(--text-muted);">
+              <span style="display:flex;align-items:center;gap:0.3rem;"><i class="bi bi-person-fill" style="color:var(--warning);"></i> <strong>Leader:</strong> <span style="color:var(--dark);">{{ team.leader.username|upper }}</span></span>
+              <span style="display:flex;align-items:center;gap:0.3rem;"><i class="bi bi-people" style="color:var(--primary-light);"></i> <strong>Members:</strong> <span style="color:var(--dark);">{{ team.team_members.count }}</span></span>
+            </div>
+          </div>
+          <div style="color:var(--text-muted);font-size:1.2rem;"><i class="bi bi-chevron-down summary-chevron"></i></div>
+        </summary>
+        <div style="padding:0 1.5rem 1.5rem;border-top:1px solid var(--border-light);background:var(--bg-light);">
+          <div style="margin-top:1.25rem;">
+            <h4 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:0.75rem;font-weight:700;">Team Members List</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:1rem;">
+              {% for tm in team.team_members.all %}
+              <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow-xs);">
+                <div class="ds-avatar" style="width:42px;height:42px;font-size:0.85rem;">{{ tm.user.username|slice:":2"|upper }}</div>
+                <div style="flex:1;">
+                  <div style="font-weight:600;font-size:0.95rem;color:var(--dark);line-height:1.2;">{{ tm.user.username|upper }}</div>
+                  <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.2rem;">
+                    {% if tm.user.profile.branch %}{{ tm.user.profile.branch }}{% if tm.user.profile.year %}, Year {{ tm.user.profile.year }}{% endif %}{% else %}Profile incomplete{% endif %}
+                  </div>
+                </div>
+                {% if tm.user == team.leader %}
+                <span class="ds-badge ds-badge-yellow" style="font-size:0.65rem;">👑 Leader</span>
+                {% else %}
+                <span class="ds-badge ds-badge-gray" style="font-size:0.65rem;">Member</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </details>
+      {% empty %}
+      <div class="ds-card" style="padding:4rem 0;text-align:center;border-radius:12px;"><i class="bi bi-diagram-3" style="font-size:2.5rem;color:var(--border);"></i><p style="margin-top:1rem;color:var(--text-muted);">No teams have registered yet.</p></div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+<style>
+/* Accordion Reset and Styles */
+details > summary {
+  list-style: none; /* For Firefox */
+}
+details > summary::-webkit-details-marker {
+  display: none; /* For WebKit edge / Chrome */
+}
+details[open] .summary-chevron {
+  transform: rotate(180deg);
+}
+.summary-chevron {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+/* Enhanced Hover Effect */
+.team-card-expandable:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md) !important;
+  border-color: rgba(79, 70, 229, 0.2) !important;
+}
+
+@media (max-width: 768px) {
+  .ds-banner-wrapper {
+    max-height: 200px !important;
+  }
+  .ds-banner-wrapper img {
+    max-height: 200px !important;
+  }
+}
+</style>
+
+<div class="modal fade" id="deleteContestModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border:none;border-radius:12px;overflow:hidden;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+      <div class="modal-header border-0 pb-0" style="padding:1.35rem 1.35rem 0.45rem;">
+        <h5 class="modal-title" style="font-weight:700;color:#b91c1c;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:0.35rem;"></i>Delete Contest</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="padding:1.35rem;">
+        <p style="margin:0;color:#334155;">Are you sure you want to delete <strong>{{ contest.title }}</strong>?</p>
+        <p style="margin:0.6rem 0 0;font-size:0.82rem;color:#94a3b8;">This action is permanent and cannot be undone.</p>
+      </div>
+      <div class="modal-footer border-0" style="padding:0 1.35rem 1.35rem;">
+        <button type="button" class="ds-btn ds-btn-ghost" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" action="{% url 'admin_panel:contest_delete' contest.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="ds-btn ds-btn-danger">Delete Permanently</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

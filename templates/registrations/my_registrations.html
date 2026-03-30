@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}My Registrations{% endblock %}
+{% block content %}
+<div class="ds-page-hero">
+  <div class="ds-container">
+    <div class="ds-eyebrow">Participation</div>
+    <h1>My Registrations</h1>
+    <p>All contests you have signed up for.</p>
+  </div>
+</div>
+
+<div class="ds-container" style="padding-top:2rem;padding-bottom:3rem;">
+  {% if registrations %}
+  <div class="ds-grid ds-grid-2">
+    {% for r in registrations %}
+    <div class="ds-card hover-lift">
+      <div class="ds-card-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.8rem;">
+          <div>
+            <a href="{% url 'contests:detail' r.contest.pk %}" style="text-decoration:none;color:inherit;">
+              <h3 style="font-size:1rem;margin:0 0 0.35rem;">{{ r.contest.title }}</h3>
+            </a>
+            <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+              <span class="cat-b cat-{{ r.contest.category|lower|cut:' ' }}">{{ r.contest.category }}</span>
+              {% if r.team %}
+              <span class="badge bg-primary-subtle text-primary">Team</span>
+              {% else %}
+              <span class="badge bg-secondary-subtle text-secondary">Individual</span>
+              {% endif %}
+              {% with s=r.contest.get_status %}
+              <span class="badge-status st-{{ s|slugify }}">{{ s }}</span>
+              {% endwith %}
+            </div>
+          </div>
+          <span style="font-size:0.75rem;color:#94a3b8;white-space:nowrap;">{{ r.created_at|date:"M d, Y" }}</span>
+        </div>
+
+        <div style="margin-top:0.95rem;padding-top:0.95rem;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;gap:0.5rem;align-items:center;">
+          <div style="font-size:0.82rem;color:#64748b;">
+            {% if r.team %}
+            <span style="font-weight:600;color:#0f172a;">{{ r.team.name }}</span> · Leader {{ r.team.leader.username }}
+            {% else %}
+            Solo registration
+            {% endif %}
+          </div>
+
+          <div>
+            {% if r.team %}
+              {% with status=r.contest.get_status %}
+                {% if status == 'Registration Open' %}
+                  {% if request.user == r.team.leader %}
+                    <a href="{% url 'teams:unregister' r.team.id %}" class="ds-btn ds-btn-danger ds-btn-sm">Unregister</a>
+                  {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary">Waiting for Leader</span>
+                  {% endif %}
+                {% elif status == 'Ongoing' %}
+                  <span class="badge bg-warning-subtle text-warning">Team Locked</span>
+                {% elif status == 'Completed' %}
+                  <span class="badge bg-danger-subtle text-danger">Completed</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">Registration Closed</span>
+                {% endif %}
+              {% endwith %}
+            {% elif r.contest.get_status != 'Registration Open' %}
+              <button type="button" class="ds-btn ds-btn-danger ds-btn-sm" disabled>{{ r.contest.get_status }}</button>
+            {% else %}
+              <a href="{% url 'registrations:unregister_contest' r.id %}" class="ds-btn ds-btn-danger ds-btn-sm">Unregister</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-ico"><i class="bi bi-clipboard-x"></i></div>
+    <h3>No registrations found</h3>
+    <p>Browse contests and register to participate.</p>
+    <a href="{% url 'contests:list' %}" class="ds-btn ds-btn-primary" style="margin-top:1rem;">Browse Contests</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
