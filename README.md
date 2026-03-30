@@ -30,8 +30,6 @@ A full-stack Django web application designed to streamline the management of col
 
 ## 📸 Screenshots
 
-<h2>📸 Screenshots</h2>
-
 <h3>🏠 Home</h3>
 <img src="screenshots/home.png" width="700"/>
 
