@@ -1,71 +1,122 @@
-# Contest Management System
-## RVR & JC College of Engineering — Department of CSE (Data Science)
+# 🎯 Contest Hub
 
-A premium institutional platform for managing hackathons, coding contests, and workshops.
+### Web-Based Contest Registration and Management System
+
+A full-stack Django web application designed to streamline the management of college-level hackathons and coding contests. The system provides role-based dashboards, team management, and a seamless registration experience for students and administrators.
 
 ---
 
-## Setup & Run
+## 🚀 Features
+
+* 🔐 User Authentication (Admin & Student Roles)
+* 🧑‍💼 Admin Dashboard for Contest Management
+* 🎓 Student Dashboard with Contest Overview
+* 👥 Team Creation & Join via Unique Code
+* 📝 Contest Registration System
+* 📂 Bulk User Upload using CSV
+* 📢 Announcements & Notifications
+* 🎨 Clean, Responsive UI (Bootstrap आधारित)
+
+---
+
+## 🏗️ System Architecture
+
+* **Frontend:** HTML, CSS, Bootstrap, JavaScript
+* **Backend:** Django (Python)
+* **Database:** PostgreSQL (Production), SQLite (Development)
+* **ORM:** Django ORM
+
+---
+
+## 📸 Screenshots
+
+> *(Add screenshots here after uploading images to a `screenshots/` folder)*
+
+```md
+![Home](screenshots/home.png)
+![Dashboard](screenshots/dashboard.png)
+![Contests](screenshots/contests.png)
+![Teams](screenshots/teams.png)
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the repository
 
 ```bash
-# 1. Install dependencies
+git clone https://github.com/ravuribhargav/contest-hub.git
+cd contest-hub
+```
+
+### 2️⃣ Create virtual environment
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 3️⃣ Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# 2. Apply database migrations
+### 4️⃣ Apply migrations
+
+```bash
+python manage.py makemigrations
 python manage.py migrate
+```
 
-# 3. Seed sample data (admin + students + contests)
-python manage.py seed_data
+### 5️⃣ Run development server
 
-# 4. Start the development server
+```bash
 python manage.py runserver
 ```
 
-Open: **http://127.0.0.1:8000**
+---
+
+## 🧩 Project Modules
+
+* **Accounts** → Authentication, user roles, profiles
+* **Contests** → Contest creation, scheduling, status
+* **Teams** → Team creation, join via secure code
+* **Registrations** → Contest registration logic
+* **Admin Panel** → Full control over users & contests
+* **Announcements** → Broadcast updates to users
 
 ---
 
-## Login Credentials
+## 💡 Key Highlights
 
-| Role    | Username | Password     |
-|---------|----------|-------------|
-| Admin   | admin    | admin123    |
-| Student | alice    | student123  |
-| Student | bob      | student123  |
-| Student | carol    | student123  |
-
----
-
-## Key URLs
-
-| URL                          | Description            |
-|------------------------------|------------------------|
-| `/`                          | Homepage               |
-| `/contests/`                 | Browse contests        |
-| `/contests/<id>/`            | Contest detail         |
-| `/archive/`                  | Completed contests     |
-| `/teams/`                    | My Teams               |
-| `/registrations/`            | My Registrations       |
-| `/accounts/login/`           | Login page             |
-| `/accounts/profile/`         | Student profile        |
-| `/admin/`                    | Admin panel            |
-| `/admin/contests/`           | Manage contests        |
-| `/admin/users/`              | Manage users           |
-| `/admin/announcements/`      | Manage announcements   |
+* ✔ Role-Based Access Control
+* ✔ Secure Team Join Code System
+* ✔ Clean & Modern UI Design
+* ✔ Scalable Django Architecture
+* ✔ Suitable for Academic & Real-world Use
 
 ---
 
-## Features
+## 🔮 Future Enhancements
 
-- Contest management (Hackathon, Coding Contest, Workshop)
-- Team system with invite codes
-- Eligibility enforcement (branch + year)
-- Live countdown timer to next contest
-- Admin participant export (CSV)
-- Announcement bar management
-- Contest archive grouped by year
-- Premium website-style UI (Inter font, clean cards)
+* 📧 Email Notifications
+* 🏆 Leaderboard & Result System
+* ☁️ Deployment (AWS / Render)
+* 🔗 REST API Integration
+* 📊 Analytics Dashboard
 
 ---
 
-© 2026 RVR & JC College of Engineering. Developed by CSE (Data Science).
+## 👨‍💻 Author
+
+**Ravuri Bhargav**
+📧 [ravuribhargav22@gmail.com](mailto:ravuribhargav22@gmail.com)
+🔗 GitHub: https://github.com/ravuribhargav
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub!
